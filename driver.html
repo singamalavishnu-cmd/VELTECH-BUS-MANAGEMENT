@@ -94,8 +94,16 @@
         pendingUpsert = promise;
         const { error } = await promise;
         if (pendingUpsert === promise) { pendingUpsert = null; }
-        if (error) { console.error('upsert error', error); showError(error.message); }
-      } catch (e) { console.error('upsert exception', e); showError('Network/DB error'); }
+        if (error) {
+          console.error('upsert error', error);
+          showError(`Database error: ${error.message}`);
+        } else {
+          console.log(`Position updated for bus ${busNo}: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+        }
+      } catch (e) {
+        console.error('upsert exception', e);
+        showError(`Network/Database error: ${e.message}`);
+      }
     }
 
     function startTracking() {
@@ -107,7 +115,7 @@
       isTracking = true;
       latest = null;
 
-      setStatus('Tracking started…', true);
+      setStatus('Getting GPS permission and starting location tracking...', true);
 
       // WatchPosition for live updates
       try {
@@ -126,7 +134,13 @@
       // Interval sender (throttled)
       timerId = setInterval(() => {
         if (!isTracking || !latest) return;
-        upsertPosition(busNo, latest.lat, latest.lng, latest.speed ?? null, latest.heading ?? null);
+        upsertPosition(busNo, latest.lat, latest.lng, latest.speed ?? null, latest.heading ?? null)
+          .then(() => {
+            if (isTracking) {
+              setStatus(`Tracking... Last update: ${new Date().toLocaleTimeString()}`, true);
+            }
+          })
+          .catch(() => {}); // Error already handled in upsertPosition
       }, intervalMs);
     }
 
@@ -157,6 +171,13 @@
     startBtn.addEventListener('click', startTracking);
     stopBtn.addEventListener('click', stopTracking);
     window.addEventListener('beforeunload', stopTracking);
+
+    // Test database connection on load
+    if (supa) {
+      setStatus('Database connected - Ready');
+    } else {
+      setStatus('Database not configured - Check console');
+    }
   </script>
 </body>
 </html>

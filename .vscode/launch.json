@@ -10,7 +10,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Open admin-login.html",
-            "file": "c:\\drive\\OneDrive\\Desktop\\NEW\\admin-interface.html"
+            "file": "c:\\drive\\OneDrive\\Desktop\\NEW\\driver.html"
         }
     ]
 }

@@ -36,13 +36,13 @@ using (true);
 create policy bus_positions_insert
 on public.bus_positions
 for insert
-to authenticated
+to anon, authenticated
 with check (true);
 
 create policy bus_positions_update
 on public.bus_positions
 for update
-to authenticated
+to anon, authenticated
 using (true)
 with check (true);
 

@@ -36,7 +36,7 @@
                 <nav class="flex space-x-2 md:space-x-4" role="tablist">
                     <button id="schedule-tab" role="tab" aria-controls="schedule-section" aria-selected="false" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200">Bus Schedule</button>
                     <button id="manage-tab" role="tab" aria-controls="manage-section" aria-selected="false" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200">Manage Routes</button>
-                    <button id="logins-tab" role="tab" aria-controls="logins-section" aria-selected="false" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200">Student Logins</button>
+                    <button id="logins-tab" role="tab" aria-controls="logins-section" aria-selected="false" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200">Students &amp; Alerts</button>
                 </nav>
                 <div class="flex space-x-2 mt-4 md:mt-0">
                     <button id="change-password-btn" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200">Change Password</button>
@@ -92,8 +92,8 @@
                     </div>
                 </div>
                 
-                <!-- Admin Notes and Helpline Section -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <!-- Admin Notes Section -->
+                <div class="grid grid-cols-1 gap-6 mt-8">
                     <div class="bg-white p-6 rounded-xl shadow-md">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-semibold text-gray-800">Special Notes from Admin</h3>
@@ -104,14 +104,6 @@
                         </p>
                         <textarea id="admin-notes-textarea" class="hidden w-full mt-2 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                         <button id="save-notes-btn" class="hidden mt-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">Save</button>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-md">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Helpline Numbers</h3>
-                        <ul class="list-disc list-inside space-y-2 text-gray-600">
-                            <li>Transport Office: 98765 43210</li>
-                            <li>Bus Coordinator: 99887 76655</li>
-                            <li>Emergency Services: 100</li>
-                        </ul>
                     </div>
                 </div>
             </section>
@@ -218,30 +210,50 @@
                 </div>
             </section>
 
-            <!-- Student Logins Section -->
+            <!-- Students & Alerts Section -->
             <section id="logins-section" class="content-section hidden">
                 <div class="bg-white p-6 rounded-xl shadow-md">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">Student Login Activity</h2>
-                        <div class="space-x-2">
-                            <button id="refresh-logs" class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Refresh</button>
-                            <button id="clear-logs" class="px-3 py-2 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700">Clear Logs</button>
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                            <span>Students &amp; Alerts</span>
+                            <span id="emergency-alert-header-badge" class="hidden px-2 py-0.5 text-xs font-semibold text-white bg-red-600 rounded-full">New</span>
+                        </h2>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-6" role="tablist">
+                        <button id="students-subtab-logins" role="tab" aria-selected="true" class="px-3 py-2 text-sm font-medium rounded-md bg-blue-600 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Student Logins</button>
+                        <button id="students-subtab-emergencies" role="tab" aria-selected="false" class="px-3 py-2 text-sm font-medium rounded-md text-gray-600 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300">Emergency Alerts</button>
+                    </div>
+                    <div id="student-logins-panel" role="tabpanel">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Student Login Activity</h3>
+                            <div class="space-x-2">
+                                <button id="refresh-logs" class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Refresh</button>
+                                <button id="clear-logs" class="px-3 py-2 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700">Clear Logs</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full table-auto border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                                        <th class="py-3 px-6 text-left rounded-tl-lg">#</th>
+                                        <th class="py-3 px-6 text-left">Email</th>
+                                        <th class="py-3 px-6 text-left">Student ID</th>
+                                        <th class="py-3 px-6 text-left rounded-tr-lg">Login Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="login-logs-tbody" class="text-gray-600 text-sm font-medium">
+                                    <tr><td colspan="4" class="py-3 px-6 text-center text-gray-400">Loading login logs...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full table-auto border-collapse">
-                            <thead>
-                                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                                    <th class="py-3 px-6 text-left rounded-tl-lg">#</th>
-                                    <th class="py-3 px-6 text-left">Email</th>
-                                    <th class="py-3 px-6 text-left">Student ID</th>
-                                    <th class="py-3 px-6 text-left rounded-tr-lg">Login Time</th>
-                                </tr>
-                            </thead>
-                            <tbody id="login-logs-tbody" class="text-gray-600 text-sm font-medium">
-                                <tr><td colspan="4" class="py-3 px-6 text-center text-gray-400">Loading login logs...</td></tr>
-                            </tbody>
-                        </table>
+                    <div id="emergency-alerts-panel" role="tabpanel" class="hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Emergency Alerts</h3>
+                        </div>
+                        <div id="emergency-alerts-list" class="space-y-3 max-h-96 overflow-y-auto text-sm text-gray-600">
+                            <p class="text-gray-500">No emergency alerts yet.</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -493,11 +505,21 @@
         const adminNotesTextarea = document.getElementById('admin-notes-textarea');
         const editNotesBtn = document.getElementById('edit-notes-btn');
         const saveNotesBtn = document.getElementById('save-notes-btn');
+        const emergencyAlertCount = document.getElementById('emergency-alert-count');
+        const emergencyAlertBadge = document.getElementById('emergency-alert-badge');
+        const emergencyAlertsList = document.getElementById('emergency-alerts-list');
+        const studentLoginsPanel = document.getElementById('student-logins-panel');
+        const emergencyAlertsPanel = document.getElementById('emergency-alerts-panel');
+        const studentsSubtabLogins = document.getElementById('students-subtab-logins');
+        const studentsSubtabEmergencies = document.getElementById('students-subtab-emergencies');
+        const emergencyAlertHeaderBadge = document.getElementById('emergency-alert-header-badge');
 
         let isEditing = false;
         let editingIndex = -1;
         let suppressTopLevelSync = false;
         let isNotesEditing = false;
+        let emergencyAlerts = [];
+        let emergencyLastSeen = null;
         
         // --- Persistence Keys ---
         const ADMIN_STORAGE = {
@@ -505,6 +527,7 @@
             adminAuth: 'vt_admin_authed'
         };
         const ADMIN_ALLOWED_UID = '8bd75827-1bcb-45eb-8aa2-1ff722ee6ddc';
+        const EMERGENCY_LAST_SEEN_KEY = 'vt_admin_emergency_last_seen';
 
         // --- Functions ---
         
@@ -541,6 +564,111 @@
                 controls[idx + 1].focus();
             }
         }
+
+        function normalizeEmergencyRow(row) {
+            if (!row) return null;
+            return {
+                id: row.id,
+                incident_type: row.incident_type,
+                reported_by_type: row.reported_by_type,
+                reported_by_id: row.reported_by_id,
+                bus_no: row.bus_no,
+                route_id: row.route_id,
+                location_lat: row.location_lat,
+                location_lng: row.location_lng,
+                description: row.description,
+                severity: row.severity,
+                status: row.status,
+                created_at: row.created_at,
+                message: row.message // optional in case of notifications join
+            };
+        }
+
+        async function loadEmergencyAlerts(initial = false) {
+            if (!window.supabaseClient) return;
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('emergency_incidents')
+                    .select('id, incident_type, reported_by_type, reported_by_id, bus_no, route_id, location_lat, location_lng, description, severity, status, created_at')
+                    .order('created_at', { ascending: false })
+                    .limit(25);
+                if (error) throw error;
+                emergencyAlerts = (data || []).map(normalizeEmergencyRow).filter(Boolean);
+                if (initial && !emergencyLastSeen) {
+                    emergencyLastSeen = loadEmergencyLastSeen();
+                }
+                renderEmergencyAlerts();
+            } catch (e) {
+                console.error('loadEmergencyAlerts error', e);
+                if (emergencyAlertsList) {
+                    emergencyAlertsList.innerHTML = '<p class="text-red-600">Failed to load emergency alerts.</p>';
+                }
+            }
+        }
+
+        let _emergencyChannel = null;
+
+        function subscribeEmergencyAlerts() {
+            try {
+                if (!window.supabaseClient || _emergencyChannel) return;
+                _emergencyChannel = window.supabaseClient
+                    .channel('emergency_incidents_live_admin')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'emergency_incidents' }, (payload) => {
+                        try {
+                            const row = payload.new || payload.old || null;
+                            if (payload.eventType === 'DELETE') {
+                                emergencyAlerts = emergencyAlerts.filter(alert => alert.id !== (row && row.id));
+                            } else if (row) {
+                                const normalized = normalizeEmergencyRow(row);
+                                if (!normalized) return;
+                                const idx = emergencyAlerts.findIndex(alert => alert.id === normalized.id);
+                                if (idx >= 0) {
+                                    emergencyAlerts[idx] = normalized;
+                                } else {
+                                    emergencyAlerts.unshift(normalized);
+                                }
+                            }
+                            emergencyAlerts = emergencyAlerts
+                                .filter(Boolean)
+                                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                            renderEmergencyAlerts();
+                        } catch (err) {
+                            console.error('Realtime emergency alert error', err);
+                        }
+                    })
+                    .subscribe();
+            } catch (e) {
+                console.error('subscribeEmergencyAlerts error', e);
+            }
+        }
+
+        function setStudentSubtab(active) {
+            const showLogins = active === 'logins';
+            if (studentsSubtabLogins) {
+                studentsSubtabLogins.setAttribute('aria-selected', showLogins ? 'true' : 'false');
+                studentsSubtabLogins.classList.toggle('bg-blue-600', showLogins);
+                studentsSubtabLogins.classList.toggle('text-white', showLogins);
+                studentsSubtabLogins.classList.toggle('text-gray-600', !showLogins);
+                studentsSubtabLogins.classList.toggle('bg-gray-200', !showLogins);
+            }
+            if (studentsSubtabEmergencies) {
+                studentsSubtabEmergencies.setAttribute('aria-selected', showLogins ? 'false' : 'true');
+                studentsSubtabEmergencies.classList.toggle('bg-blue-600', !showLogins);
+                studentsSubtabEmergencies.classList.toggle('text-white', !showLogins);
+                studentsSubtabEmergencies.classList.toggle('text-gray-600', showLogins);
+                studentsSubtabEmergencies.classList.toggle('bg-gray-200', showLogins);
+            }
+            if (studentLoginsPanel) studentLoginsPanel.classList.toggle('hidden', !showLogins);
+            if (emergencyAlertsPanel) emergencyAlertsPanel.classList.toggle('hidden', showLogins);
+        }
+
+        if (studentsSubtabLogins) {
+            studentsSubtabLogins.addEventListener('click', () => setStudentSubtab('logins'));
+        }
+        if (studentsSubtabEmergencies) {
+            studentsSubtabEmergencies.addEventListener('click', () => setStudentSubtab('emergencies'));
+        }
+        setStudentSubtab('logins');
 
         if (addBusForm) {
             addBusForm.addEventListener('keydown', (e) => {
@@ -1239,6 +1367,128 @@
             messageBox.classList.add('hidden');
         }
 
+        function loadEmergencyLastSeen() {
+            try {
+                const stored = localStorage.getItem(EMERGENCY_LAST_SEEN_KEY);
+                return stored ? new Date(stored) : null;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function saveEmergencyLastSeen(ts) {
+            try {
+                localStorage.setItem(EMERGENCY_LAST_SEEN_KEY, ts instanceof Date ? ts.toISOString() : (ts || ''));
+            } catch (_) {}
+        }
+
+        function markEmergencyAlertsSeen(latestTimestamp) {
+            saveEmergencyLastSeen(latestTimestamp || new Date());
+            emergencyLastSeen = loadEmergencyLastSeen();
+            if (emergencyAlertBadge) emergencyAlertBadge.classList.add('hidden');
+            if (emergencyAlertHeaderBadge) emergencyAlertHeaderBadge.classList.add('hidden');
+            if (emergencyAlertsList) emergencyAlertsList.classList.remove('notes-blink');
+        }
+
+        function renderEmergencyAlerts() {
+            if (!emergencyAlertsList) return;
+            emergencyAlertsList.innerHTML = '';
+
+            if (!emergencyAlerts || emergencyAlerts.length === 0) {
+                const empty = document.createElement('p');
+                empty.className = 'text-gray-500';
+                empty.textContent = 'No emergency alerts yet.';
+                emergencyAlertsList.appendChild(empty);
+                if (emergencyAlertCount) emergencyAlertCount.textContent = '0';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            const lastSeenTime = emergencyLastSeen ? emergencyLastSeen.getTime() : 0;
+            let hasUnseen = false;
+
+            emergencyAlerts.forEach((alert) => {
+                const card = document.createElement('div');
+                card.className = 'border border-red-200 rounded-lg p-3 bg-red-50';
+
+                const header = document.createElement('div');
+                header.className = 'flex justify-between items-center mb-2';
+
+                const title = document.createElement('h4');
+                title.className = 'font-semibold text-red-700';
+                title.textContent = alert.title || 'Emergency Alert';
+
+                const time = document.createElement('span');
+                time.className = 'text-xs text-red-600';
+                time.textContent = formatDateTime(alert.created_at);
+
+                header.appendChild(title);
+                header.appendChild(time);
+
+                const body = document.createElement('p');
+                body.className = 'text-sm text-gray-700';
+                body.textContent = alert.message || alert.description || 'No details provided.';
+
+                const meta = document.createElement('div');
+                meta.className = 'mt-2 text-xs text-gray-500 space-y-1';
+                if (alert.reported_by_type || alert.reported_by_id) {
+                    const reporter = document.createElement('div');
+                    reporter.textContent = `Reported by: ${alert.reported_by_type || 'unknown'}${alert.reported_by_id ? ` (${alert.reported_by_id})` : ''}`;
+                    meta.appendChild(reporter);
+                }
+                if (alert.incident_type) {
+                    const type = document.createElement('div');
+                    type.textContent = `Type: ${alert.incident_type}`;
+                    meta.appendChild(type);
+                }
+                if (alert.severity) {
+                    const severity = document.createElement('div');
+                    severity.textContent = `Severity: ${alert.severity}`;
+                    meta.appendChild(severity);
+                }
+                if (alert.bus_no) {
+                    const bus = document.createElement('div');
+                    bus.textContent = `Bus: ${alert.bus_no}`;
+                    meta.appendChild(bus);
+                }
+                if (alert.location_lat != null && alert.location_lng != null) {
+                    const loc = document.createElement('div');
+                    loc.textContent = `Location: ${Number(alert.location_lat).toFixed(5)}, ${Number(alert.location_lng).toFixed(5)}`;
+                    meta.appendChild(loc);
+                }
+                if (alert.status) {
+                    const status = document.createElement('div');
+                    status.textContent = `Status: ${alert.status}`;
+                    meta.appendChild(status);
+                }
+
+                card.appendChild(header);
+                card.appendChild(body);
+                if (meta.childElementCount) card.appendChild(meta);
+
+                const createdTime = alert.created_at ? new Date(alert.created_at).getTime() : 0;
+                if (createdTime > lastSeenTime) {
+                    card.classList.add('notes-blink');
+                    hasUnseen = true;
+                }
+
+                fragment.appendChild(card);
+            });
+
+            emergencyAlertsList.appendChild(fragment);
+            if (emergencyAlertCount) emergencyAlertCount.textContent = String(emergencyAlerts.length);
+
+            if (hasUnseen) {
+                if (emergencyAlertBadge) emergencyAlertBadge.classList.remove('hidden');
+                if (emergencyAlertHeaderBadge) emergencyAlertHeaderBadge.classList.remove('hidden');
+                if (emergencyAlertsList) emergencyAlertsList.classList.add('notes-blink');
+            } else {
+                if (emergencyAlertBadge) emergencyAlertBadge.classList.add('hidden');
+                if (emergencyAlertHeaderBadge) emergencyAlertHeaderBadge.classList.add('hidden');
+                if (emergencyAlertsList) emergencyAlertsList.classList.remove('notes-blink');
+            }
+        }
+
         // --- Admin Notes: Edit/Save wired to Supabase ---
         function setNotesEditing(state) {
             isNotesEditing = !!state;
@@ -1832,6 +2082,18 @@
                 
                 updateView();
                 console.log('View updated');
+
+                emergencyLastSeen = loadEmergencyLastSeen();
+                await loadEmergencyAlerts(true);
+                subscribeEmergencyAlerts();
+                if (emergencyAlertsList) {
+                    emergencyAlertsList.addEventListener('click', () => {
+                        if (emergencyAlerts && emergencyAlerts.length > 0) {
+                            markEmergencyAlertsSeen(emergencyAlerts[0]?.created_at || new Date());
+                            renderEmergencyAlerts();
+                        }
+                    });
+                }
                 
                 // Hash routing: #dashboard, #schedule, #manage, #logins
                 if (location.hash) {

@@ -34,9 +34,9 @@
                 </div>
                 <!-- Navigation Tabs -->
                 <nav class="flex space-x-2 md:space-x-4" role="tablist">
-                    <button id="dashboard-tab" role="tab" aria-controls="dashboard-section" aria-selected="true" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200 bg-gray-200 text-gray-800">Dashboard</button>
+                    <button id="dashboard-tab" role="tab" aria-controls="dashboard-section" aria-selected="true" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200 bg-gray-200 text-gray-800">Dashboard<span id="dashboard-notes-dot" class="hidden ml-2 inline-flex h-2 w-2 rounded-full bg-red-600"></span></button>
                     <button id="schedule-tab" role="tab" aria-controls="schedule-section" aria-selected="false" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200">Bus Schedule</button>
-                    <button id="student-logout-btn" class="px-3 py-2 md:px-4 md:py-2 font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:bg-red-700 transition-colors duration-200">Logout</button>
+                    <button id="student-logout-btn" class="px-3 py-2 md:px-4 md:py-2 font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition-colors duration-200">Logout</button>
                 </nav>
                 
             </div>
@@ -80,10 +80,10 @@
                 
                 <!-- Admin Notes and Helpline Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                    <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div id="admin-notes-card" class="bg-white p-6 rounded-xl shadow-md cursor-pointer">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-semibold text-gray-800">Special Notes from Admin</h3>
-                            
+                            <span id="admin-notes-badge" class="hidden px-2 py-0.5 text-xs font-semibold text-white bg-red-600 rounded-full">New</span>
                         </div>
                         <p id="admin-notes-display" class="text-gray-600">
                             Loading notes...
@@ -92,7 +92,15 @@
                         <button id="save-notes-btn" class="hidden mt-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">Save</button>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-md">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Helpline Numbers</h3>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">Helpline Numbers</h3>
+                            <button id="emergency-btn" class="px-4 py-2 font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:bg-red-700 transition-colors duration-200 flex items-center space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                                <span>Emergency</span>
+                            </button>
+                        </div>
                         <ul class="list-disc list-inside space-y-2 text-gray-600">
                             <li>Transport Office: 98765 43210</li>
                             <li>Bus Coordinator: 99887 76655</li>
@@ -146,9 +154,35 @@
             </div>
         </div>
         
+        <!-- Emergency Modal -->
+        <div id="emergency-modal" class="modal hidden">
+            <div class="modal-content max-w-md" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="emergency-modal-title" class="text-xl font-bold text-red-600">🚨 Emergency</h2>
+                    <button id="close-emergency-modal" class="text-gray-500 hover:text-gray-700">&times;</button>
+                </div>
+
+                <!-- Panic Button Section -->
+                <div class="mb-6">
+                    <button id="panic-button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg text-xl transition-colors duration-200">
+                        🚨 PANIC BUTTON
+                    </button>
+                    <p class="text-sm text-gray-600 text-center mt-2">Press only in case of real emergency</p>
+                </div>
+
+                <!-- Emergency Contacts -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Emergency Contacts</h3>
+                    <div id="emergency-contacts" class="space-y-2">
+                        <!-- Contacts will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Stops Modal -->
         <div id="stops-modal" class="modal hidden">
-            <div class="modal-content">
+            <div class="modal-content" onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center mb-4">
                     <h2 id="stops-modal-title" class="text-xl font-bold">Bus Stops</h2>
                     <button id="close-stops-modal" class="text-gray-500 hover:text-gray-700">&times;</button>
@@ -239,19 +273,31 @@
         const closeStopsModal = document.getElementById('close-stops-modal');
        
 
-        // Immediately hide modal on page load
+        // Emergency modal elements
+        const emergencyBtn = document.getElementById('emergency-btn');
+        const emergencyModal = document.getElementById('emergency-modal');
+        const closeEmergencyModal = document.getElementById('close-emergency-modal');
+        const panicButton = document.getElementById('panic-button');
+        const emergencyContacts = document.getElementById('emergency-contacts');
+
+        // Immediately hide modals on page load
         if (stopsModal) {
             stopsModal.classList.add('hidden');
+        }
+        if (emergencyModal) {
+            emergencyModal.classList.add('hidden');
         }
        
 
         // Admin Notes elements
         const adminNotesDisplay = document.getElementById('admin-notes-display');
+        const adminNotesCard = document.getElementById('admin-notes-card');
+        const adminNotesBadge = document.getElementById('admin-notes-badge');
+        const dashboardNotesDot = document.getElementById('dashboard-notes-dot');
         
 
         let isEditing = false;
         let editingIndex = -1;
-        
         // --- Functions ---
         
         /**
@@ -511,14 +557,51 @@
         // Allow closing the stops modal with Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                hideStopsModal();
+                if (stopsModal && !stopsModal.classList.contains('hidden')) {
+                    hideStopsModal();
+                }
+                if (emergencyModal && !emergencyModal.classList.contains('hidden')) {
+                    hideEmergencyModal();
+                }
             }
         });
          
          /**
           * Initializes the admin notes display by fetching the latest note.
           */
-         async function initializeAdminNotes() {
+         const ADMIN_NOTES_LAST_VIEWED_KEY = 'vt_admin_notes_last_viewed_at';
+
+        function markNotesViewed(timestamp) {
+            try { localStorage.setItem(ADMIN_NOTES_LAST_VIEWED_KEY, timestamp || ''); } catch (_) {}
+            if (adminNotesBadge) adminNotesBadge.classList.add('hidden');
+            if (dashboardNotesDot) dashboardNotesDot.classList.add('hidden');
+            if (adminNotesDisplay) adminNotesDisplay.classList.remove('notes-blink');
+        }
+
+        function handleNotesUpdate(updatedAtIso) {
+            const lastViewed = (() => {
+                try { return localStorage.getItem(ADMIN_NOTES_LAST_VIEWED_KEY) || ''; } catch (_) { return ''; }
+            })();
+            const hasViewed = lastViewed && updatedAtIso && new Date(lastViewed).getTime() >= new Date(updatedAtIso).getTime();
+            if (!hasViewed) {
+                if (adminNotesBadge) adminNotesBadge.classList.remove('hidden');
+                if (dashboardNotesDot) dashboardNotesDot.classList.remove('hidden');
+                if (adminNotesDisplay) adminNotesDisplay.classList.add('notes-blink');
+            }
+        }
+
+        if (adminNotesCard) {
+            adminNotesCard.addEventListener('click', () => {
+                if (adminNotesDisplay) {
+                    adminNotesDisplay.classList.remove('notes-blink');
+                }
+                if (adminNotesBadge && !adminNotesBadge.classList.contains('hidden')) {
+                    markNotesViewed(new Date().toISOString());
+                }
+            });
+        }
+
+        async function initializeAdminNotes() {
             adminNotesDisplay.textContent = 'Loading notes...';
             if (window.supabaseClient) {
                 try {
@@ -529,8 +612,10 @@
                         .limit(1);
                     if (!error && Array.isArray(data) && data.length > 0) {
                         adminNotesDisplay.textContent = data[0].content || '';
+                        handleNotesUpdate(data[0].updated_at || new Date().toISOString());
                     } else if (data && data.length === 0) {
                         adminNotesDisplay.textContent = 'No special notes from Admin at this time.';
+                        markNotesViewed(new Date().toISOString());
                     }
                 } catch (e) { 
                     console.error('initializeAdminNotes error', e); 
@@ -555,6 +640,7 @@
                           }
                           if (row && row.content && adminNotesDisplay) {
                               adminNotesDisplay.textContent = row.content;
+                              handleNotesUpdate(row.updated_at || new Date().toISOString());
                           } else {
                               initializeAdminNotes();
                           }
@@ -562,6 +648,155 @@
                   })
                   .subscribe();
             } catch(_) {}
+        }
+
+        /**
+         * Shows the emergency modal.
+         */
+        function showEmergencyModal() {
+            if (emergencyModal) {
+                emergencyModal.classList.remove('hidden');
+                loadEmergencyContacts();
+            }
+        }
+
+        /**
+         * Hides the emergency modal.
+         */
+        function hideEmergencyModal() {
+            if (emergencyModal) {
+                emergencyModal.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Loads emergency contacts from database.
+         */
+        async function loadEmergencyContacts() {
+            if (!window.supabaseClient || !emergencyContacts) return;
+
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('emergency_contacts')
+                    .select('*')
+                    .eq('is_active', true)
+                    .not('contact_type', 'in', '(transport_office,admin)') // Filter out transport office and admin
+                    .order('priority', { ascending: true });
+
+                if (!error && Array.isArray(data)) {
+                    // Clear existing contacts to prevent duplicates
+                    emergencyContacts.innerHTML = '';
+
+                    // Use a Set to ensure no duplicates by phone number
+                    const seenPhones = new Set();
+                    const uniqueContacts = data.filter(contact => {
+                        if (!seenPhones.has(contact.phone)) {
+                            seenPhones.add(contact.phone);
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    uniqueContacts.forEach(contact => {
+                        const contactDiv = document.createElement('div');
+                        contactDiv.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                        contactDiv.innerHTML = `
+                            <div>
+                                <div class="font-medium text-gray-800">${contact.name}</div>
+                                <div class="text-sm text-gray-600">${contact.phone}</div>
+                                ${contact.email ? `<div class="text-xs text-gray-500">${contact.email}</div>` : ''}
+                            </div>
+                            <button onclick="window.open('tel:${contact.phone}', '_self')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                📞 Call
+                            </button>
+                        `;
+                        emergencyContacts.appendChild(contactDiv);
+                    });
+                }
+            } catch (e) {
+                console.error('Error loading emergency contacts:', e);
+            }
+        }
+
+        /**
+         * Handles panic button click.
+         */
+        async function handlePanicButton() {
+            const studentId = localStorage.getItem('vt_student_id') || 'unknown';
+            const currentLocation = await getCurrentLocation();
+
+            try {
+                const result = await window.createEmergencyIncident(
+                    'panic_button',
+                    'student',
+                    studentId,
+                    null, // bus_no
+                    null, // route_id
+                    currentLocation ? currentLocation.lat : null,
+                    currentLocation ? currentLocation.lng : null,
+                    'Panic button activated by student',
+                    'critical'
+                );
+
+                if (result.error) {
+                    showMessage('Failed to send emergency alert. Please try again or call emergency services directly.');
+                } else {
+                    showMessage('🚨 Emergency alert sent successfully! Help is on the way. Please stay safe.');
+                    hideEmergencyModal();
+                }
+            } catch (error) {
+                console.error('Panic button error:', error);
+                showMessage('Emergency alert failed. Please call emergency services directly.');
+            }
+        }
+
+        /**
+         * Gets current location using browser geolocation.
+         */
+        function getCurrentLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    resolve(null);
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        resolve({
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        });
+                    },
+                    (error) => {
+                        console.log('Geolocation error:', error);
+                        resolve(null); // Don't reject, just return null
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 300000 // 5 minutes
+                    }
+                );
+            });
+        }
+
+        /**
+         * Initializes emergency features.
+         */
+        async function initEmergencyFeatures() {
+            // Load emergency contacts on startup
+            await loadEmergencyContacts();
+
+            // Set up emergency modal backdrop click
+            if (emergencyModal) {
+                emergencyModal.addEventListener('click', (e) => {
+                    if (e.target === emergencyModal) {
+                        hideEmergencyModal();
+                    }
+                });
+            }
+
+            // Note: Escape key handler is now consolidated in the main escape key handler above
         }
 
          /**
@@ -782,11 +1017,14 @@
         }
 
         // Refresh student KPIs on dashboard show and periodically (visibility-aware) + hash routing
-        document.addEventListener('DOMContentLoaded', () => {
-            try { refreshStudentDashboardStats(); } catch(_) {}
+        async function initializeStudentInterface() {
             try {
+                // Initialize KPI timer
+                refreshStudentDashboardStats();
                 if (window._studentKpiTimer) { clearInterval(window._studentKpiTimer); }
                 window._studentKpiTimer = setInterval(refreshStudentDashboardStats, 15000);
+
+                // Set up visibility change handler
                 document.addEventListener('visibilitychange', () => {
                     try {
                         if (document.hidden) {
@@ -797,22 +1035,22 @@
                         }
                     } catch(_) {}
                 });
-            } catch(_) {}
 
-            // Hash routing: #dashboard, #schedule
-            if (location.hash) {
-                const h = location.hash;
-                if (h === '#dashboard') {
+                // Hash routing: #dashboard, #schedule
+                if (location.hash) {
+                    const h = location.hash;
+                    if (h === '#dashboard') {
+                        showDashboard();
+                    } else if (h === '#schedule') {
+                        // Click the tab to trigger its logic
+                        scheduleTab.click();
+                    }
+                } else {
+                    // Default view
                     showDashboard();
-                } else if (h === '#schedule') {
-                    // Click the tab to trigger its logic
-                    scheduleTab.click(); 
                 }
-            } else {
-                // Default view
-                showDashboard();
-            }
-        });
+            } catch(_) {}
+        }
 
         
         scheduleTableBody.addEventListener('click', (e) => {
@@ -825,41 +1063,97 @@
 
         closeStopsModal.addEventListener('click', hideStopsModal);
 
-        
+        // Emergency event listeners
+        if (emergencyBtn) { emergencyBtn.addEventListener('click', showEmergencyModal); }
+        if (closeEmergencyModal) { closeEmergencyModal.addEventListener('click', hideEmergencyModal); }
+        if (panicButton) { panicButton.addEventListener('click', handlePanicButton); }
 
         function logoutStudent() {
-            try { hideStopsModal(); } catch (e) {}
             try {
+                // Hide all modals
+                hideStopsModal();
+                hideEmergencyModal();
+                hideMessage();
+
+                // Clear all intervals and timers
+                if (window._studentKpiTimer) {
+                    clearInterval(window._studentKpiTimer);
+                    window._studentKpiTimer = null;
+                }
+                if (_studentBusPollTimer) {
+                    clearInterval(_studentBusPollTimer);
+                    _studentBusPollTimer = null;
+                }
+
+                // Unsubscribe from realtime channels
+                try {
+                    if (_studentBusChannel) {
+                        window.supabaseClient.removeChannel(_studentBusChannel);
+                        _studentBusChannel = null;
+                    }
+                    if (_notesChannel) {
+                        window.supabaseClient.removeChannel(_notesChannel);
+                        _notesChannel = null;
+                    }
+                } catch (e) {}
+
+                // Clear map and markers if they exist
+                try {
+                    if (window._studentLeafletMap) {
+                        window._studentLeafletMap.remove();
+                        window._studentLeafletMap = null;
+                        window._studentMarker = null;
+                    }
+                    if (_studentBusMarkers) {
+                        _studentBusMarkers.clear();
+                        _studentBusMarkers = null;
+                    }
+                } catch (e) {}
+
+                // Clear local storage
                 localStorage.removeItem('vt_student_authed');
                 localStorage.removeItem('vt_student_id');
-            } catch (e) {}
-            window.location.href = 'student-login.html';
+
+                // Redirect to login
+                window.location.href = 'student-login.html';
+            } catch (e) {
+                console.error('Logout error:', e);
+                // Force redirect even if cleanup fails
+                window.location.href = 'student-login.html';
+            }
         }
 
         // Initial setup
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('Student interface initializing...');
-            
+
             try {
                 hideStopsModal();
-                
+                hideEmergencyModal();
+
                 // Load admin data (notes and routes)
                 await initializeAdminNotes();
-                subscribeAdminNotes(); 
+                subscribeAdminNotes();
                 await loadAdminRoutes();
-                
+
+                // Initialize emergency features
+                await initEmergencyFeatures();
+
                 initStudentMap();
-                
+
                 // Start the clock
                 updateTime();
                 setInterval(updateTime, 1000);
-                
+
                 // Preload schedule for today
                 populateScheduleTable(new Date());
 
+                // Initialize student interface features
+                await initializeStudentInterface();
+
                 // Log student login (once per load)
                 logStudentLogin();
-                
+
             } catch (error) {
                 console.error('Error during student interface initialization:', error);
             }

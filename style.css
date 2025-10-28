@@ -108,6 +108,19 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.notes-blink {
+    animation: notes-blink 1s ease-in-out infinite;
+}
+
+@keyframes notes-blink {
+    0%, 100% {
+        color: inherit;
+    }
+    50% {
+        color: #dc2626;
+    }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .modal-content {

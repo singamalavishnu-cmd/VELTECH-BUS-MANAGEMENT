@@ -11,9 +11,13 @@ body {
     font-family: 'Inter', sans-serif;
     height: 100vh;
     width: 100vw;
-    overflow: hidden;
+    /* overflow: hidden; Removed to allow scrolling on other pages */
     display: flex;
     background-color: #f8fafc;
+}
+
+body.landing-page {
+    overflow: hidden;
 }
 
 /* Split Layout */

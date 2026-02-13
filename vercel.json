@@ -1,0 +1,14 @@
+{
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "rewrites": [
+        {
+            "source": "/admin",
+            "destination": "/admin-login.html"
+        },
+        {
+            "source": "/student",
+            "destination": "/student-login.html"
+        }
+    ]
+}

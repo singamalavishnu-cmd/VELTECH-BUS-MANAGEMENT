@@ -188,6 +188,8 @@
                     <div id="weekly-dates-container" class="flex flex-wrap gap-2 mt-2 md:mt-0">
                         <!-- Weekly dates will be populated here -->
                     </div>
+                    <!-- Hidden date input for JS compatibility -->
+                    <input type="date" id="schedule-date" class="hidden">
                     <p id="current-time" class="text-lg font-bold text-gray-700 ml-4"></p>
                 </div>
                 <div class="overflow-x-auto">
@@ -3148,7 +3150,7 @@
                 // Load all routes from database
                 const { data, error } = await window.supabaseClient
                     .from('bus_routes')
-                    .select('route_number, route_name, route_stops(sequence_order, estimated_arrival_time, bus_stops(stop_name))')
+                    .select('id, route_number, route_name, route_stops(sequence_order, estimated_arrival_time, bus_stops(stop_name))')
                     .order('route_number');
 
                 if (error) {
@@ -3184,7 +3186,7 @@
                     const arr = stopsArr.length ? (stopsArr[stopsArr.length - 1].estimated_arrival_time || '').toString().slice(0, 5) : '';
                     const sched = {};
                     daysOfWeek.forEach(d => { sched[d] = { departureTime: dep, eta: arr }; });
-                    return { busNo: r.route_number, route: r.route_name, schedule: sched, stops, isUserAdded: true };
+                    return { id: r.id, busNo: r.route_number, route: r.route_name, schedule: sched, stops, isUserAdded: true };
                 });
             } catch (e) {
                 console.error('loadRoutes DB error', e);
@@ -3201,287 +3203,7 @@
             let authedOnce = false;
             for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
-                    // Configuration - Update these with your actual Supabase details
-                    const supabaseUrl = 'https://your-project-ref.supabase.co'; // ⚠️ UPDATE THIS
-                    const supabaseAnonKey = 'your-anon-key-here'; // ⚠️ UPDATE THIS
-
-                    // Test configuration on load
-                    console.log('🔧 Checking Supabase Configuration:');
-                    console.log('URL:', supabaseUrl);
-                    console.log('Key configured:', supabaseAnonKey ? 'Yes' : 'No');
-                    console.log('Current URL origin:', window.location.origin);
-                    console.log('Environment:', navigator.onLine ? 'Online' : 'Offline');
-
-                    // DNS resolution test
-                    console.log('🔍 Testing DNS resolution for your-project-ref.supabase.co');
-                    fetch(`https://your-project-ref.supabase.co`)
-                        .then(() => console.log('✅ HTTPS connection to Supabase successful'))
-                        .catch(() => console.error('❌ HTTPS connection failed'));
-
-                    // Alternative: Try direct IP test
-                    console.log('🔍 Testing direct connection to Supabase IP...');
-                    fetch('https://api.supabase.co')
-                        .then(() => console.log('✅ Direct IP connection successful'))
-                        .catch(() => console.error('❌ Direct IP connection failed'));
-
-                    // Alternative: Try IP address directly
-                    console.log('🔍 Testing direct IP connection...');
-                    const supabaseIp = '34.117.35.238'; // Common Supabase IP range
-                    const testUrl = `https://${supabaseIp}:443`;
-                    fetch(testUrl)
-                        .then(() => console.log('✅ Direct IP connection successful'))
-                        .catch(() => console.error('❌ Direct IP connection failed'));
-
-                    // If DNS fails, provide alternative
-                    console.log('💡 If DNS fails, try using IP address directly in URL');
-                    console.log('💡 Alternative URL format: https://34.117.35.238:443');
-
-                    // Comprehensive network diagnostics
-                    async function diagnoseNetworkIssues() {
-                        console.log('🔍 Starting network diagnostics...');
-
-                        const diagnostics = {
-                            timestamp: new Date().toISOString(),
-                            userAgent: navigator.userAgent,
-                            onlineStatus: navigator.onLine,
-                            connection: navigator.connection || 'unknown',
-                            supabaseUrl: supabaseUrl,
-                            supabaseKeyConfigured: !!supabaseAnonKey
-                        };
-
-                        // Test 1: Basic connectivity
-                        try {
-                            const response = await fetch(`${supabaseUrl}/rest/v1/`, {
-                                method: 'HEAD',
-                                mode: 'no-cors'
-                            });
-
-                            diagnostics.connectivityTest = {
-                                status: response.status,
-                                ok: response.ok,
-                                headers: Object.fromEntries(response.headers.entries())
-                            };
-
-                            console.log('✅ Basic connectivity test:', diagnostics.connectivityTest);
-                        } catch (e) {
-                            diagnostics.connectivityTest = {
-                                status: 'error',
-                                error: e.message,
-                                ok: false
-                            };
-                            console.error('❌ Basic connectivity test failed:', e);
-                        }
-
-                        // Test 2: DNS resolution
-                        try {
-                            const url = new URL(supabaseUrl);
-                            const hostname = url.hostname;
-                            console.log('🔍 Testing DNS resolution for:', hostname);
-
-                            // This will show in console if DNS fails
-                            const testResult = await Promise.race([
-                                fetch(`https://${hostname}`),
-                                fetch(`http://${hostname}`)
-                            ]);
-
-                            diagnostics.dnsTest = {
-                                hostname: hostname,
-                                httpsResolved: testResult[0].ok,
-                                httpResolved: testResult[1] && testResult[1].ok,
-                                bothFailed: !testResult[0].ok && !testResult[1].ok
-                            };
-
-                            console.log('✅ DNS resolution test:', diagnostics.dnsTest);
-                        } catch (e) {
-                            diagnostics.dnsTest = {
-                                hostname: 'unknown',
-                                error: e.message,
-                                bothFailed: true
-                            };
-                            console.error('❌ DNS resolution test failed:', e);
-                        }
-
-                        // Test 3: Supabase-specific RPC test
-                        if (window.supabaseClient) {
-                            try {
-                                const { data, error } = await window.supabaseClient
-                                    .from('bus_routes')
-                                    .select('count')
-                                    .single();
-
-                                diagnostics.rpcTest = {
-                                    available: !error,
-                                    count: data?.count || 0,
-                                    error: error?.message
-                                };
-
-                                console.log('✅ Supabase RPC test:', diagnostics.rpcTest);
-                            } catch (e) {
-                                diagnostics.rpcTest = {
-                                    available: false,
-                                    error: e.message
-                                };
-                                console.error('❌ Supabase RPC test failed:', e);
-                            }
-                        } else {
-                            diagnostics.rpcTest = {
-                                available: false,
-                                error: 'Supabase client not initialized'
-                            };
-                        }
-
-                        // Test 4: Browser capabilities
-                        diagnostics.browserCapabilities = {
-                            supportsFetch: typeof fetch !== 'undefined',
-                            supportsPromises: typeof Promise !== 'undefined',
-                            supportsAsyncAwait: typeof async !== 'undefined',
-                            supportsServiceWorker: 'serviceWorker' in navigator,
-                            supportsWebSockets: typeof WebSocket !== 'undefined'
-                        };
-
-                        console.log('🌐 Browser capabilities:', diagnostics.browserCapabilities);
-
-                        // Display comprehensive results
-                        console.log('📊 Full Network Diagnostics:', diagnostics);
-
-                        // Store for debugging
-                        sessionStorage.setItem('network_diagnostics', JSON.stringify(diagnostics));
-
-                        return diagnostics;
-                    }
-
-                    // Run diagnostics on page load
-                    diagnoseNetworkIssues();
-
-                    // Temporary workaround for TLS issues - try HTTP for testing
-                    const supabaseUrlHttp = supabaseUrl.replace('https://', 'http://'); // Remove 's' for testing
-
-                    // Test both HTTPS and HTTP
-                    console.log('🔧 Testing with both HTTPS and HTTP...');
-                    console.log('HTTPS URL:', supabaseUrl);
-                    console.log('HTTP URL:', supabaseUrlHttp);
-
-                    // Test configuration on load
-                    console.log('🔧 Checking Supabase Configuration:');
-                    console.log('URL:', supabaseUrl);
-                    console.log('Key configured:', supabaseAnonKey ? 'Yes' : 'No');
-
-                    // Initialize Supabase client with better error handling
-                    // Initialize Supabase client with fallback to HTTP
-                    let supabaseClient;
-
-                    try {
-                        supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey, {
-                            auth: {
-                                persistSession: true,
-                                autoRefreshToken: true,
-                                detectSessionInUrl: true
-                            },
-                            db: {
-                                schema: 'public'
-                            }
-                        });
-                        console.log('✅ HTTPS connection successful');
-                    } catch (e) {
-                        console.warn('⚠️ HTTPS failed, trying HTTP fallback:', e);
-                        try {
-                            const httpUrl = supabaseUrl.replace('https://', 'http://');
-                            supabaseClient = supabase.createClient(httpUrl, supabaseAnonKey, {
-                                auth: {
-                                    persistSession: true,
-                                    autoRefreshToken: true,
-                                    detectSessionInUrl: true
-                                },
-                                db: {
-                                    schema: 'public'
-                                }
-                            });
-                            console.log('✅ HTTP fallback connection successful');
-                        } catch (fallbackError) {
-                            console.error('❌ Both HTTPS and HTTP failed:', fallbackError);
-                            supabaseClient = null;
-                        }
-                    }
-
-                    window.supabaseClient = supabaseClient;
-
-                    // Add connection status monitoring
-                    window.supabaseClient.onAuthStateChange((event, session) => {
-                        console.log('Supabase auth state changed:', event, session);
-                        if (event === 'SIGNED_OUT') {
-                            showMessage('Session expired. Please refresh the page.');
-                        } else if (event === 'TOKEN_REFRESHED') {
-                            console.log('Token refreshed successfully');
-                        }
-                    });
-
-                    // Add real-time connection monitoring
-                    window.supabaseClient
-                        .channel('db-changes')
-                        .on('postgres_changes', (payload) => {
-                            console.log('Database change detected:', payload);
-                        })
-                        .subscribe((status) => {
-                            if (status === 'SUBSCRIBED') {
-                                console.log('Real-time database connection established');
-                            } else if (status === 'CLOSED') {
-                                console.warn('Real-time database connection lost');
-                                showMessage('Database connection lost. Attempting to reconnect...');
-                                // Attempt to reconnect after 3 seconds
-                                setTimeout(() => {
-                                    window.supabaseClient.realtime.connect();
-                                }, 3000);
-                            }
-                        });
-
-                    // Add connection test function
-                    async function testDatabaseConnection() {
-                        try {
-                            const { data, error } = await window.supabaseClient
-                                .from('bus_routes')
-                                .select('count')
-                                .single();
-
-                            if (error) {
-                                console.error('Database connection test failed:', error);
-                                return false;
-                            } else {
-                                console.log('Database connection test successful');
-                                return true;
-                            }
-                        } catch (e) {
-                            console.error('Database connection test error:', e);
-                            return false;
-                        }
-                    }
-
-                    // Test connection on page load with detailed logging
-                    testDatabaseConnection().then(isConnected => {
-                        if (!isConnected) {
-                            showMessage('⚠️ Database connection issues detected. Checking configuration...');
-
-                            // Log detailed connection info
-                            console.log('=== Database Connection Test ===');
-                            console.log('Supabase URL:', supabaseUrl);
-                            console.log('API Key configured:', supabaseAnonKey ? 'Yes' : 'No');
-                            console.log('Auth state:', window.supabaseClient?.auth?.getSession()?.user || 'No session');
-
-                            // Test basic query
-                            window.supabaseClient.from('bus_routes').select('count').single()
-                                .then(({ data, error }) => {
-                                    if (error) {
-                                        console.error('Query test failed:', error);
-                                        showMessage(`Database query failed: ${error.message}`);
-                                    } else {
-                                        console.log('✅ Database query successful. Routes found:', data?.count || 0);
-                                        showMessage('Database connection working, but route data may be missing');
-                                    }
-                                });
-                        } else {
-                            console.log('✅ Database connection established');
-                            showMessage('✅ Database connection working! Ready to sync routes.');
-                        }
-                    });
+                    // Proceed with sync
                     const { data, error } = await window.supabaseClient.rpc('sync_route', {
                         route_json: payload.route_json  // Correct parameter name
                     });
@@ -3784,7 +3506,7 @@
 
         // Edit route function
         function editRoute(routeId) {
-            const route = addedRoutesData.find(r => r.id === routeId);
+            const route = addedRoutesData.find(r => String(r.id) === String(routeId));
             if (!route) {
                 showMessage('Route not found');
                 return;
@@ -3922,7 +3644,7 @@
                 return;
             }
 
-            const routeIndex = addedRoutesData.findIndex(r => r.id === routeId);
+            const routeIndex = addedRoutesData.findIndex(r => String(r.id) === String(routeId));
             if (routeIndex === -1) {
                 showMessage('Route not found');
                 return;
@@ -4089,7 +3811,7 @@
                     const formData = new FormData(assignDriverForm);
                     const driverData = {
                         driver_name: formData.get('driverName'),
-                        driver_phone: formData.get('driverPhone'),
+                        // driver_phone: formData.get('driverPhone'), // Removed: Column not in DB schema
                         route_number: formData.get('driverBusNumber'), // Use route_number for foreign key
                         status: 'active',
                         created_at: new Date().toISOString()
@@ -4378,6 +4100,10 @@
                 parsedStops[0].time = dep24;
                 parsedStops[parsedStops.length - 1].time = eta24;
             } catch (_) { }
+
+            // Define start/end points (defaults as inputs are missing)
+            const startPoint = 'Vel Tech';
+            const endPoint = 'Destination';
 
             const newOrUpdatedRoute = {
                 busNo: busNumber,

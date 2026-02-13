@@ -3813,6 +3813,7 @@
                         driver_name: formData.get('driverName'),
                         // driver_phone: formData.get('driverPhone'), // Removed: Column not in DB schema
                         route_number: formData.get('driverBusNumber'), // Use route_number for foreign key
+                        bus_no: formData.get('driverBusNumber'), // Added: Missing column required by DB constraint
                         status: 'active',
                         created_at: new Date().toISOString()
                     };

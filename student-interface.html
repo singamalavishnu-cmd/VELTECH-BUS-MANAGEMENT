@@ -262,9 +262,16 @@
         // Auth guard: require local student login
         (function () {
             try {
-                if (localStorage.getItem('vt_student_authed') !== 'true') {
-                    window.location.href = 'student-login.html';
+                // Check Session
+                if (sessionStorage.getItem('vt_student_authed') !== 'true') {
+                    window.location.replace('student-login.html');
                 }
+                // BFCache Guard: Reload if page is restored from cache (back button)
+                window.addEventListener('pageshow', function (event) {
+                    if (event.persisted) {
+                        window.location.reload();
+                    }
+                });
             } catch (e) { }
         })();
 
@@ -345,7 +352,7 @@
             try {
                 // Since this uses anon/authenticated role, we don't need the session check
                 // but we need to pass student data
-                const studentId = localStorage.getItem('vt_student_id') || null;
+                const studentId = sessionStorage.getItem('vt_student_id') || null;
                 const studentEmail = `vtu${studentId}@veltech.edu.in`; // Synthetic email for logging
 
                 await window.supabaseClient.rpc('log_student_login', {
@@ -751,7 +758,7 @@
          * Handles panic button click.
          */
         async function handlePanicButton() {
-            const studentId = localStorage.getItem('vt_student_id') || 'unknown';
+            const studentId = sessionStorage.getItem('vt_student_id') || 'unknown';
             const currentLocation = await getCurrentLocation();
 
             try {
@@ -1309,7 +1316,8 @@
                 } catch (e) { }
 
                 // Clear local storage
-                localStorage.removeItem('vt_student_authed');
+                sessionStorage.clear(); // Clear all session data
+                localStorage.removeItem('vt_student_authed'); // Clear backup just in case
                 localStorage.removeItem('vt_student_id');
 
                 // Redirect to login (replace history to prevent back button)

@@ -67,10 +67,7 @@
                             </div>
                         </div>
                     </div>
-                    <button id="dashboard-tab" role="tab" aria-controls="dashboard-section" aria-selected="true"
-                        class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200 bg-gray-200 text-gray-800">Dashboard<span
-                            id="dashboard-notes-dot"
-                            class="hidden ml-2 inline-flex h-2 w-2 rounded-full bg-red-600"></span></button>
+
                     <button id="schedule-tab" role="tab" aria-controls="schedule-section" aria-selected="false"
                         class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200">Bus
                         Schedule</button>
@@ -932,7 +929,7 @@
         }
 
         // --- Event Listeners ---
-        if (dashboardTab) { dashboardTab.addEventListener('click', showDashboard); }
+
         if (logo) { logo.addEventListener('click', showDashboard); }
         if (siteTitle) { siteTitle.addEventListener('click', showDashboard); }
 
@@ -1315,12 +1312,12 @@
                 localStorage.removeItem('vt_student_authed');
                 localStorage.removeItem('vt_student_id');
 
-                // Redirect to login
-                window.location.href = 'student-login.html';
+                // Redirect to login (replace history to prevent back button)
+                window.location.replace('student-login.html');
             } catch (e) {
                 console.error('Logout error:', e);
                 // Force redirect even if cleanup fails
-                window.location.href = 'student-login.html';
+                window.location.replace('student-login.html');
             }
         }
 

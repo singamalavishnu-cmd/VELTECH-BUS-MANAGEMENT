@@ -154,8 +154,12 @@
                     </p>
                     <textarea id="admin-notes-textarea"
                         class="hidden w-full mt-2 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
-                    <button id="save-notes-btn"
-                        class="hidden mt-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">Save</button>
+                    <div class="flex space-x-2 mt-2">
+                        <button id="cancel-notes-btn"
+                            class="hidden px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200">Cancel</button>
+                        <button id="save-notes-btn"
+                            class="hidden px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">Save</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -387,7 +391,7 @@
                 <div id="student-logins-panel" role="tabpanel">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-semibold text-gray-800">Student Login Activity</h3>
-                        <div class="space-x-2">
+                        <div class="flex flex-row space-x-2">
                             <button id="refresh-logs"
                                 class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Refresh</button>
                             <button id="clear-logs"
@@ -4428,6 +4432,136 @@
 
 
         messageOkBtn.addEventListener('click', hideMessage);
+
+        // --- Cancel Notes Logic ---
+        const cancelNotesBtn = document.getElementById('cancel-notes-btn');
+
+        if (editNotesBtn) {
+            editNotesBtn.addEventListener('click', () => {
+                isNotesEditing = true;
+                if (adminNotesDisplay) {
+                    adminNotesDisplay.classList.add('hidden');
+                    // Pre-fill textarea with current notes (removing any HTML tags if simple text)
+                    adminNotesTextarea.value = adminNotesDisplay.textContent.trim();
+                }
+                if (adminNotesTextarea) adminNotesTextarea.classList.remove('hidden');
+                if (saveNotesBtn) saveNotesBtn.classList.remove('hidden');
+                if (cancelNotesBtn) cancelNotesBtn.classList.remove('hidden');
+                if (editNotesBtn) editNotesBtn.classList.add('hidden');
+            });
+        }
+
+        if (cancelNotesBtn) {
+            cancelNotesBtn.addEventListener('click', () => {
+                isNotesEditing = false;
+                if (adminNotesTextarea) {
+                    adminNotesTextarea.classList.add('hidden');
+                    adminNotesTextarea.value = ''; // Clear edit
+                }
+                if (saveNotesBtn) saveNotesBtn.classList.add('hidden');
+                if (cancelNotesBtn) cancelNotesBtn.classList.add('hidden');
+                if (editNotesBtn) editNotesBtn.classList.remove('hidden');
+                if (adminNotesDisplay) adminNotesDisplay.classList.remove('hidden');
+            });
+        }
+
+        if (saveNotesBtn) saveNotesBtn.addEventListener('click', saveAdminNote);
+
+
+        // --- Change Password Logic ---
+        if (changePasswordBtn) {
+            changePasswordBtn.addEventListener('click', () => {
+                if (changePasswordModal) {
+                    changePasswordModal.classList.remove('hidden');
+                    // Reset form
+                    if (changePasswordForm) changePasswordForm.reset();
+                    if (cpError) cpError.classList.add('hidden');
+                    if (cpSuccess) cpSuccess.classList.add('hidden');
+                }
+            });
+        }
+
+        if (closeChangePasswordModalBtn) {
+            closeChangePasswordModalBtn.addEventListener('click', () => {
+                if (changePasswordModal) changePasswordModal.classList.add('hidden');
+            });
+        }
+
+        if (cpCancel) {
+            cpCancel.addEventListener('click', () => {
+                if (changePasswordModal) changePasswordModal.classList.add('hidden');
+            });
+        }
+
+        if (changePasswordForm) {
+            changePasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (cpError) cpError.classList.add('hidden');
+                if (cpSuccess) cpSuccess.classList.add('hidden');
+
+                const currentPwd = cpCurrent.value;
+                const newPwd = cpNew.value;
+                const confirmPwd = cpConfirm.value;
+
+                if (!newPwd || !confirmPwd) { // Current pwd might not be needed if session is active, keeping it simple
+                    if (cpError) {
+                        cpError.textContent = 'Please fill in all fields.';
+                        cpError.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                if (newPwd !== confirmPwd) {
+                    if (cpError) {
+                        cpError.textContent = 'New passwords do not match.';
+                        cpError.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                if (newPwd.length < 6) {
+                    if (cpError) {
+                        cpError.textContent = 'Password must be at least 6 characters.';
+                        cpError.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                showLoading();
+
+                try {
+                    if (!window.supabaseClient) throw new Error('Database connection failed');
+
+                    // If we are using Supabase Auth, we can update the user directly
+                    const { data, error } = await window.supabaseClient.auth.updateUser({
+                        password: newPwd
+                    });
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    if (cpSuccess) {
+                        cpSuccess.textContent = '✅ Password updated successfully!';
+                        cpSuccess.classList.remove('hidden');
+                    }
+
+                    setTimeout(() => {
+                        if (changePasswordModal) changePasswordModal.classList.add('hidden');
+                        if (cpSuccess) cpSuccess.classList.add('hidden');
+                    }, 1500);
+
+                } catch (err) {
+                    console.error('Password update error:', err);
+                    if (cpError) {
+                        cpError.textContent = err.message || 'Failed to update password.';
+                        cpError.classList.remove('hidden');
+                    }
+                } finally {
+                    hideLoading();
+                }
+            });
+        }
 
         // Add null checks for all event listeners
         function safeAddEventListener(element, event, handler) {

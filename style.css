@@ -1,5 +1,204 @@
 /* Additional custom styles for Vel Tech Bus Management */
 
+/* Global Reset & Typography */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    background-color: #f8fafc;
+}
+
+/* Split Layout */
+.split-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.image-side {
+    flex: 1.2;
+    /* Takes up slightly more space like reference */
+    background: url('images/college.jpg') no-repeat center center;
+    background-size: cover;
+    position: relative;
+}
+
+/* Optional: Overlay on image for better text contrast if we had text there, 
+   but for now just the image as requested */
+.image-side::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    /* Subtle dark overlay */
+}
+
+.content-side {
+    flex: 0.8;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 3rem;
+    /* equivalent to p-12 or p-16 */
+    position: relative;
+}
+
+/* Typography & Content Highlighting */
+.brand-tag {
+    /* text-transform: uppercase; Removed for long name */
+    letter-spacing: 0.05em;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    /* Slate-500 */
+    margin-bottom: 0.5rem;
+    display: block;
+    line-height: 1.4;
+}
+
+h1 {
+    font-family: 'Inter', sans-serif;
+    /* Changed to sans-serif */
+    font-size: 3.5rem;
+    /* Large headline */
+    line-height: 1.1;
+    color: #1e293b;
+    /* Slate-800 */
+    margin-bottom: 2rem;
+    font-weight: 800;
+    /* Bolder */
+    letter-spacing: -0.02em;
+    /* Lighter weight for elegance */
+}
+
+h1 span {
+    display: block;
+    /* font-style: italic; Removed to match Bus Management */
+    /* font-weight: 600; Removed to inherit 800 */
+    color: #475569;
+    /* Slightly lighter for hierarchy, or remove if they want exact same */
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    max-width: 400px;
+}
+
+/* Buttons */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+    /* Mobile first, override for desktop if needed */
+    max-width: 400px;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    /* Sharper corners for modern look */
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background-color: #0f172a;
+    /* Slate-900 */
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #334155;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+/* Features List (Simplified) */
+.features-grid {
+    margin-top: 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 2rem;
+}
+
+.feature-item {
+    font-size: 0.9rem;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.feature-icon {
+    color: #0f172a;
+    font-weight: bold;
+}
+
+/* Credits / Footer in sidebar */
+.footer-note {
+    position: absolute;
+    bottom: 2rem;
+    left: 3rem;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .split-container {
+        flex-direction: column;
+    }
+
+    .image-side {
+        flex: 0.4;
+        /* Image takes top 40% */
+        min-height: 300px;
+    }
+
+    .content-side {
+        flex: 0.6;
+        padding: 2rem;
+        overflow-y: auto;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+    }
+}
+
+/* --- Legacy / Utility Styles (Preserved) --- */
 /* Ensure proper display of content sections */
 .content-section {
     display: block;
@@ -9,7 +208,6 @@
     display: none;
 }
 
-/* Modal styles */
 .modal {
     position: fixed;
     top: 0;
@@ -38,7 +236,6 @@
     margin: 1rem;
 }
 
-/* Message box styles */
 .message-box {
     position: fixed;
     top: 50%;
@@ -51,7 +248,6 @@
     display: none;
 }
 
-/* Loading spinner */
 #loading-spinner {
     position: fixed;
     top: 0;
@@ -75,15 +271,17 @@
 }
 
 @keyframes bus-animation {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateX(0);
     }
+
     50% {
         transform: translateX(10px);
     }
 }
 
-/* Ensure proper button interactions */
 button {
     cursor: pointer;
 }
@@ -93,12 +291,10 @@ button:disabled {
     cursor: not-allowed;
 }
 
-/* Table hover effects */
 tbody tr:hover {
     background-color: rgb(243, 244, 246);
 }
 
-/* Form input focus states */
 input:focus,
 textarea:focus,
 select:focus {
@@ -113,21 +309,23 @@ select:focus {
 }
 
 @keyframes notes-blink {
-    0%, 100% {
+
+    0%,
+    100% {
         color: inherit;
     }
+
     50% {
         color: #dc2626;
     }
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .modal-content {
         margin: 0.5rem;
         padding: 1.5rem;
     }
-    
+
     .message-box {
         margin: 1rem;
         max-width: calc(100% - 2rem);

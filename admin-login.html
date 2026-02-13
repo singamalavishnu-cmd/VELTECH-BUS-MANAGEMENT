@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="css/output.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
     <div class="w-full max-w-md bg-white p-6 rounded-xl shadow-md">
@@ -125,8 +124,17 @@
     </div>
 
     <script>
-        // Supabase client from centralized config
-        const supabase = window.supabaseClient;
+        // Initialize Supabase client directly
+        const SUPABASE_URL = 'https://nlzneuelzgbrkevcbcxw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sem5ldWVsemdicmtldmNiY3h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4MTU2MDIsImV4cCI6MjA3NDM5MTYwMn0.iEdXK9g3_gsL-HyGNhmL69_huo0R3PFm-zU4qYM-9XM';
+        
+        // Initialize Supabase client with different variable name to avoid conflict
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                autoRefreshToken: true,
+                persistSession: false
+            }
+        });
 
         // Storage keys
         const STORAGE_KEYS = {
@@ -157,27 +165,38 @@
         // Check if Supabase is available
         let supabaseAvailable = false;
 
-        // Test Supabase connection
-        async function testSupabaseConnection() {
+        // Check connection on page load
+        async function checkConnection() {
+            const statusElement = document.getElementById('connection-status');
+            
+            // Add timeout to prevent hanging
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Connection timeout')), 5000)
+            );
+            
             try {
-                const { data, error } = await supabase
+                statusElement.textContent = '🔄 Testing connection...';
+                statusElement.className = 'text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded';
+                
+                // Test connection to admin_credentials table
+                const connectionPromise = supabaseClient
                     .from('admin_credentials')
-                    .select('count')
-                    .limit(1);
+                    .select('count', { count: 'exact', head: true });
                 
-                supabaseAvailable = !error;
-                console.log('🔗 Supabase connection:', supabaseAvailable ? '✅ Connected' : '❌ Failed');
-                console.log('📊 Connection details:', { data, error });
+                // Race the connection test against the timeout
+                const { data, error } = await Promise.race([connectionPromise, timeoutPromise]);
                 
-                // Show connection status on page
-                showConnectionStatus();
+                if (error) {
+                    throw error;
+                }
                 
-                return supabaseAvailable;
-            } catch (error) {
-                console.error('Supabase connection test failed:', error);
-                supabaseAvailable = false;
-                showConnectionStatus();
-                return false;
+                statusElement.textContent = 'System Connected 🟢';
+                statusElement.className = 'text-xs text-green-600 bg-green-100 px-2 py-1 rounded';
+                
+            } catch (err) {
+                console.error('Connection error:', err);
+                statusElement.textContent = 'Connection Failed 🔴';
+                statusElement.className = 'text-xs text-red-600 bg-red-100 px-2 py-1 rounded';
             }
         }
 
@@ -249,7 +268,7 @@
             }
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('admin_credentials')
                     .select('*')
                     .eq('username', DEFAULT_ADMIN.username)
@@ -257,7 +276,7 @@
 
                 if (error && error.code === 'PGRST116') {
                     // Admin doesn't exist, create default admin
-                    const { error: insertError } = await supabase
+                    const { error: insertError } = await supabaseClient
                         .from('admin_credentials')
                         .insert([{
                             username: DEFAULT_ADMIN.username,
@@ -335,7 +354,7 @@
         async function authenticateAdmin(username, password) {
             // Supabase-only authentication
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('admin_credentials')
                     .select('*')
                     .eq('username', username)
@@ -359,7 +378,7 @@
         async function verifyPhoneNumber(phone) {
             // Supabase-only phone verification
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('admin_credentials')
                     .select('phone')
                     .eq('phone', phone)
@@ -381,7 +400,7 @@
         async function updateAdminPassword(phone, newPassword) {
             // Supabase-only password update
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('admin_credentials')
                     .update({ password: newPassword })
                     .eq('phone', phone);
@@ -407,31 +426,47 @@
                 return;
             }
 
-            // Map username -> Supabase email
-            const ADMIN_USERNAME = 'admin';
-            const ADMIN_EMAIL = 'singamalavishnu@gmail.com';
-            if (username.toLowerCase() !== ADMIN_USERNAME) {
-                showError('Invalid username');
-                return;
-            }
-
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password });
-                if (error) {
-                    showError(error.message || 'Unable to sign in.');
-                    return;
+                // Show loading state
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Logging in...';
+
+                // Authenticate with admin_credentials table
+                const { data, error } = await supabaseClient
+                    .from('admin_credentials')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .single();
+
+                if (error || !data) {
+                    throw new Error('Invalid username or password');
                 }
-                if (data && data.session) {
-                    showSuccess('Login successful! Redirecting...');
-                    setTimeout(() => {
-                        window.location.href = 'admin-interface.html';
-                    }, 800);
-                } else {
-                    showError('No session returned. Please try again.');
+
+                // Login successful
+                showSuccess('Login successful! Redirecting...');
+                
+                // Store session
+                sessionStorage.setItem('admin_authenticated', 'true');
+                sessionStorage.setItem('admin_username', data.username);
+                
+                // Redirect
+                setTimeout(() => {
+                    window.location.href = 'admin-interface.html';
+                }, 1000);
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(error.message || 'Login failed. Please try again.');
+            } finally {
+                // Reset button
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Login';
                 }
-            } catch (err) {
-                console.error('Supabase sign-in error:', err);
-                showError('Unexpected error during sign-in.');
             }
         });
 
@@ -571,18 +606,24 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
-            // Supabase-only: no local pre-auth redirect
-
-            // Test Supabase connection first
-            await testSupabaseConnection();
-            
-            // Show login form by default
+            // Show login form immediately
             showContainer('login-container');
+            
+            // Wait a bit for Supabase to initialize, then check connection
+            setTimeout(() => {
+                if (window.supabase) {
+                    checkConnection();
+                } else {
+                    const statusEl = document.getElementById('connection-status');
+                    statusEl.textContent = 'Supabase not initialized 🔴';
+                    statusEl.className = 'text-xs text-red-600 bg-red-100 px-2 py-1 rounded';
+                }
+            }, 100);
 
             // Add event listener for manual connection test
             const testBtn = document.getElementById('test-connection-btn');
             if (testBtn) {
-                testBtn.addEventListener('click', manualConnectionTest);
+                testBtn.addEventListener('click', checkConnection);
             }
         });
     </script>

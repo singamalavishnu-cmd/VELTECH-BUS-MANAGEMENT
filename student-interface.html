@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,38 +8,76 @@
     <link rel="stylesheet" href="css/output.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
 </head>
+
 <body class="bg-gray-100 min-h-screen flex flex-col relative z-0" data-mode="student">
     <!-- Main Application Container -->
     <div class="flex-grow flex flex-col p-4 md:p-8">
 
         <!-- Header -->
-        <header class="bg-white rounded-xl shadow-md p-4 mb-8 relative z-10">
+        <header class="bg-white rounded-xl shadow-md p-4 mb-8 relative z-30">
             <div class="flex flex-col md:flex-row items-center justify-between">
                 <div class="flex items-center space-x-4 mb-4 md:mb-0">
                     <img id="logo" src="images/vt.jpg" alt="Vel Tech Logo" class="h-12 w-auto cursor-pointer">
-                    <h1 id="site-title" class="text-2xl md:text-3xl font-bold text-gray-800 cursor-pointer">Vel Tech Bus Management</h1>
+                    <h1 id="site-title" class="text-2xl md:text-3xl font-bold text-gray-800 cursor-pointer">Vel Tech Bus
+                        Management</h1>
                 </div>
                 <!-- Navigation Tabs -->
-                <nav class="flex space-x-2 md:space-x-4" role="tablist">
-                    <button id="dashboard-tab" role="tab" aria-controls="dashboard-section" aria-selected="true" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200 bg-gray-200 text-gray-800">Dashboard<span id="dashboard-notes-dot" class="hidden ml-2 inline-flex h-2 w-2 rounded-full bg-red-600"></span></button>
-                    <button id="schedule-tab" role="tab" aria-controls="schedule-section" aria-selected="false" class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200">Bus Schedule</button>
-                    <button id="student-logout-btn" class="px-3 py-2 md:px-4 md:py-2 font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition-colors duration-200">Logout</button>
+                <nav class="flex space-x-2 md:space-x-4 items-center" role="tablist">
+                    <div class="relative z-50 mr-4">
+                        <button id="notification-btn" type="button"
+                            class="flex items-center justify-center p-3 bg-white text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full shadow-md border border-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <span id="notification-badge"
+                                class="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full border-2 border-white shadow-sm hidden">0</span>
+                        </button>
+
+                        <!-- Notification Dropdown -->
+                        <div id="notification-dropdown"
+                            class="absolute right-0 mt-3 w-96 origin-top-right bg-white rounded-xl shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-50">
+                            <div class="py-1" role="menu" aria-orientation="vertical"
+                                aria-labelledby="notification-btn">
+                                <div
+                                    class="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-xl">
+                                    <span class="text-base font-semibold text-gray-800">Notifications</span>
+                                    <button id="mark-all-read"
+                                        class="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline">Mark
+                                        all read</button>
+                                </div>
+                                <div id="notification-list" class="max-h-[20rem] overflow-y-auto overscroll-contain">
+                                    <div class="px-4 py-8 text-sm text-gray-500 text-center flex flex-col items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-300 mb-2"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                        </svg>
+                                        <p>No new notifications</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="dashboard-tab" role="tab" aria-controls="dashboard-section" aria-selected="true"
+                        class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200 bg-gray-200 text-gray-800">Dashboard<span
+                            id="dashboard-notes-dot"
+                            class="hidden ml-2 inline-flex h-2 w-2 rounded-full bg-red-600"></span></button>
+                    <button id="schedule-tab" role="tab" aria-controls="schedule-section" aria-selected="false"
+                        class="px-3 py-2 md:px-4 md:py-2 font-medium text-gray-600 rounded-lg hover:bg-gray-200 focus:outline-none focus:bg-gray-200 transition-colors duration-200">Bus
+                        Schedule</button>
+                    <button id="student-logout-btn"
+                        class="px-3 py-2 md:px-4 md:py-2 font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:bg-gray-700 transition-colors duration-200">Logout</button>
                 </nav>
-                
+
             </div>
         </header>
 
@@ -53,8 +92,10 @@
                             <p class="text-sm text-gray-500">Active Buses</p>
                             <h2 class="text-3xl font-semibold text-gray-800" id="active-buses-count">0</h2>
                         </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L11 8m0 0l-5 2.5a1 1 0 010 1.789l5 2.5m0 0l7.585-3.793a1 1 0 01.915-.028L19 12m-8 2l8 4"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L11 8m0 0l-5 2.5a1 1 0 010 1.789l5 2.5m0 0l7.585-3.793a1 1 0 01.915-.028L19 12m-8 2l8 4" />
                         </svg>
                     </div>
 
@@ -63,12 +104,14 @@
                             <p class="text-sm text-gray-500">On-Time Departures</p>
                             <h2 class="text-3xl font-semibold text-gray-800" id="on-time-count">0</h2>
                         </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
 
-                    
+
                 </div>
 
                 <div class="mt-8 bg-white p-6 rounded-xl shadow-md">
@@ -77,26 +120,32 @@
                         <div id="college-map-student" class="w-full h-full"></div>
                     </div>
                 </div>
-                
+
                 <!-- Admin Notes and Helpline Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                     <div id="admin-notes-card" class="bg-white p-6 rounded-xl shadow-md cursor-pointer">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-semibold text-gray-800">Special Notes from Admin</h3>
-                            <span id="admin-notes-badge" class="hidden px-2 py-0.5 text-xs font-semibold text-white bg-red-600 rounded-full">New</span>
+                            <span id="admin-notes-badge"
+                                class="hidden px-2 py-0.5 text-xs font-semibold text-white bg-red-600 rounded-full">New</span>
                         </div>
                         <p id="admin-notes-display" class="text-gray-600">
                             Loading notes...
                         </p>
-                        <textarea id="admin-notes-textarea" class="hidden w-full mt-2 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
-                        <button id="save-notes-btn" class="hidden mt-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">Save</button>
+                        <textarea id="admin-notes-textarea"
+                            class="hidden w-full mt-2 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <button id="save-notes-btn"
+                            class="hidden mt-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">Save</button>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-md">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-semibold text-gray-800">Helpline Numbers</h3>
-                            <button id="emergency-btn" class="px-4 py-2 font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:bg-red-700 transition-colors duration-200 flex items-center space-x-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            <button id="emergency-btn"
+                                class="px-4 py-2 font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:bg-red-700 transition-colors duration-200 flex items-center space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                                 </svg>
                                 <span>Emergency</span>
                             </button>
@@ -138,11 +187,12 @@
                 </div>
             </section>
 
-            
+
         </main>
-        
+
         <!-- Loading Spinner -->
-        <div id="loading-spinner" class="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-[99] hidden">
+        <div id="loading-spinner"
+            class="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-[99] hidden">
             <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
         </div>
 
@@ -150,10 +200,11 @@
         <div id="message-box" class="message-box hidden bg-white p-6 rounded-xl shadow-lg border border-gray-300">
             <p id="message-text" class="text-center font-medium text-gray-800"></p>
             <div class="flex justify-center mt-4">
-                <button id="message-ok" class="px-4 py-2 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">OK</button>
+                <button id="message-ok"
+                    class="px-4 py-2 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">OK</button>
             </div>
         </div>
-        
+
         <!-- Emergency Modal -->
         <div id="emergency-modal" class="modal hidden">
             <div class="modal-content max-w-md" onclick="event.stopPropagation()">
@@ -164,7 +215,8 @@
 
                 <!-- Panic Button Section -->
                 <div class="mb-6">
-                    <button id="panic-button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg text-xl transition-colors duration-200">
+                    <button id="panic-button"
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg text-xl transition-colors duration-200">
                         🚨 PANIC BUTTON
                     </button>
                     <p class="text-sm text-gray-600 text-center mt-2">Press only in case of real emergency</p>
@@ -216,62 +268,43 @@
                 if (localStorage.getItem('vt_student_authed') !== 'true') {
                     window.location.href = 'student-login.html';
                 }
-            } catch (e) {}
+            } catch (e) { }
         })();
-        
+
         // --- Data Mockup (expanded) ---
-        const busScheduleData = [
-            { 
-                busNo: 'VT-01', route: 'Chennai Central (Mock)', 
-                schedule: {
-                    Sunday: { departureTime: '09:00', eta: '09:45' },
-                    Monday: { departureTime: '08:00', eta: '08:45' },
-                    Tuesday: { departureTime: '08:00', eta: '08:45' },
-                    Wednesday: { departureTime: '08:00', eta: '08:45' },
-                    Thursday: { departureTime: '08:00', eta: '08:45' },
-                    Friday: { departureTime: '08:00', eta: '08:45' },
-                    Saturday: { departureTime: '08:30', eta: '09:15'},
-                },
-                stops: [
-                    { name: 'Vel Tech University', time: '08:00' },
-                    { name: 'Avadi', time: '08:15' },
-                    { name: 'Chennai Central', time: '09:15' }
-                ],
-                isUserAdded: false
-            }
-        ];
-        
+        const busScheduleData = [];
+
         // Routes created by admin (fetched from DB)
         let adminAddedRoutes = [];
-        const daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-        
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
         // --- DOM Elements ---
         const dashboardTab = document.getElementById('dashboard-tab');
         const scheduleTab = document.getElementById('schedule-tab');
         const studentLogoutBtn = document.getElementById('student-logout-btn');
         const logo = document.getElementById('logo');
         const siteTitle = document.getElementById('site-title');
-        
+
 
         const dashboardSection = document.getElementById('dashboard-section');
         const scheduleSection = document.getElementById('schedule-section');
-        
+
 
         const scheduleTableBody = document.getElementById('schedule-table-body');
-       
+
         const currentTimeEl = document.getElementById('current-time');
-        
+
         const weeklyDatesContainer = document.getElementById('weekly-dates-container');
 
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
         const messageOkBtn = document.getElementById('message-ok');
-        
+
         const stopsModal = document.getElementById('stops-modal');
         const stopsModalTitle = document.getElementById('stops-modal-title');
         const stopsTableBody = document.getElementById('stops-table-body');
         const closeStopsModal = document.getElementById('close-stops-modal');
-       
+
 
         // Emergency modal elements
         const emergencyBtn = document.getElementById('emergency-btn');
@@ -287,26 +320,26 @@
         if (emergencyModal) {
             emergencyModal.classList.add('hidden');
         }
-       
+
 
         // Admin Notes elements
         const adminNotesDisplay = document.getElementById('admin-notes-display');
         const adminNotesCard = document.getElementById('admin-notes-card');
         const adminNotesBadge = document.getElementById('admin-notes-badge');
         const dashboardNotesDot = document.getElementById('dashboard-notes-dot');
-        
+
 
         let isEditing = false;
         let editingIndex = -1;
         // --- Functions ---
-        
+
         /**
          * Hides all content sections.
          */
         function hideAllSections() {
             dashboardSection.classList.add('hidden');
             scheduleSection.classList.add('hidden');
-            
+
         }
 
         // Log student login via RPC (Option B)
@@ -317,20 +350,20 @@
                 // but we need to pass student data
                 const studentId = localStorage.getItem('vt_student_id') || null;
                 const studentEmail = `vtu${studentId}@veltech.edu.in`; // Synthetic email for logging
-                
+
                 await window.supabaseClient.rpc('log_student_login', {
                     p_email: studentEmail,
                     p_student_id: studentId
                 });
-            } catch(_) {}
+            } catch (_) { }
         }
 
         function showDashboard() {
             hideAllSections();
             dashboardSection.classList.remove('hidden');
-            try { initStudentMap(); } catch(_) {}
-            try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(_) {}
-            try { setActiveTab(dashboardTab); location.hash = '#dashboard'; } catch(_) {}
+            try { initStudentMap(); } catch (_) { }
+            try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) { }
+            try { setActiveTab(dashboardTab); location.hash = '#dashboard'; } catch (_) { }
         }
 
         /**
@@ -343,9 +376,9 @@
                 let hour = parseInt(h, 10);
                 let minute = parseInt(m, 10);
                 const ampm = hour >= 12 ? 'PM' : 'AM';
-                hour = hour % 12; 
+                hour = hour % 12;
                 if (hour === 0) hour = 12;
-                return `${hour.toString().padStart(1,'0')}:${(minute||'00').toString().padStart(2,'0')} ${ampm}`;
+                return `${hour.toString().padStart(1, '0')}:${(minute || '00').toString().padStart(2, '0')} ${ampm}`;
             } catch { return hhmm; }
         }
 
@@ -353,14 +386,14 @@
             try {
                 const mockRoutes = busScheduleData.filter(b => !b.isUserAdded);
                 const allBusData = [...mockRoutes, ...adminAddedRoutes];
-                
+
                 const bus = allBusData.find(b => b && b.busNo === busNo) || null;
-                      
+
                 if (!bus || !Array.isArray(bus.stops)) {
                     showMessage(`Stops not found for Bus ${busNo}.`);
                     return;
                 }
-                
+
                 if (stopsModalTitle) stopsModalTitle.textContent = `Stops for Bus ${busNo}`;
                 if (stopsTableBody) {
                     stopsTableBody.innerHTML = '';
@@ -377,38 +410,37 @@
                     });
                 }
                 if (stopsModal) stopsModal.classList.remove('hidden');
-            } catch(_) {}
+            } catch (_) { }
         }
 
         function populateScheduleTable(selectedDate) {
-                scheduleTableBody.innerHTML = '';
-                const dayOfWeek = daysOfWeek[selectedDate.getDay()];
-                
-                const mockRoutes = busScheduleData.filter(b => !b.isUserAdded);
-                const allBusData = [...mockRoutes, ...adminAddedRoutes];
-                
-                if (allBusData.length === 0) {
-                     scheduleTableBody.innerHTML = `<tr><td colspan="4" class="py-3 px-6 text-center text-gray-400">No schedules available for this day.</td></tr>`;
-                     return;
-                }
+            scheduleTableBody.innerHTML = '';
+            const dayOfWeek = daysOfWeek[selectedDate.getDay()];
 
-                allBusData.forEach(bus => {
-                    const schedule = bus.schedule[dayOfWeek];
-                    if (schedule) {
-                        const row = document.createElement('tr');
-                        row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'transition-colors', 'duration-200', 'cursor-pointer');
-                        row.setAttribute('data-bus-no', bus.busNo || '');
-                        row.innerHTML = `
+            const allBusData = [...adminAddedRoutes];
+
+            if (allBusData.length === 0) {
+                scheduleTableBody.innerHTML = `<tr><td colspan="4" class="py-3 px-6 text-center text-gray-400">No schedules available for this day.</td></tr>`;
+                return;
+            }
+
+            allBusData.forEach(bus => {
+                const schedule = bus.schedule[dayOfWeek];
+                if (schedule) {
+                    const row = document.createElement('tr');
+                    row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100', 'transition-colors', 'duration-200', 'cursor-pointer');
+                    row.setAttribute('data-bus-no', bus.busNo || '');
+                    row.innerHTML = `
                             <td class="py-3 px-6">${bus.busNo}</td>
                             <td class="py-3 px-6">${bus.route}</td>
                             <td class="py-3 px-6">${formatTimeDisplay(schedule.departureTime)}</td>
                             <td class="py-3 px-6">${formatTimeDisplay(schedule.eta)}</td>
                         `;
-                        scheduleTableBody.appendChild(row);
-                    }
-                });
+                    scheduleTableBody.appendChild(row);
+                }
+            });
         }
-        
+
         /**
          * Updates the current time displayed on the page.
          */
@@ -451,16 +483,16 @@
                         .from('bus_positions')
                         .select('bus_no, updated_at');
                     if (!error && Array.isArray(data)) positions = data;
-                } catch (_) {}
+                } catch (_) { }
             }
-            try { const s = new Set(); positions.forEach(r => r && r.bus_no && s.add(r.bus_no)); active = s.size; } catch(_) {}
-            try { if (activeBusesCountEl) activeBusesCountEl.textContent = String(active); } catch(_) {}
+            try { const s = new Set(); positions.forEach(r => r && r.bus_no && s.add(r.bus_no)); active = s.size; } catch (_) { }
+            try { if (activeBusesCountEl) activeBusesCountEl.textContent = String(active); } catch (_) { }
 
             try {
                 const dayOfWeek = daysOfWeek[new Date().getDay()];
                 const byBusNo = new Map(); positions.forEach(p => { if (p && p.bus_no) byBusNo.set(p.bus_no, p); });
                 const windowBeforeMs = 5 * 60 * 1000;
-                const windowAfterMs  = 10 * 60 * 1000;
+                const windowAfterMs = 10 * 60 * 1000;
                 onTime = 0;
                 allBusData.forEach(b => {
                     try {
@@ -472,17 +504,17 @@
                         const upd = new Date(pos.updated_at);
                         const diff = upd.getTime() - dep.getTime();
                         if (diff >= -windowBeforeMs && diff <= windowAfterMs) onTime++;
-                    } catch(_) {}
+                    } catch (_) { }
                 });
-            } catch(_) { onTime = 0; }
-            try { if (onTimeCountEl) onTimeCountEl.textContent = String(onTime); } catch(_) {}
+            } catch (_) { onTime = 0; }
+            try { if (onTimeCountEl) onTimeCountEl.textContent = String(onTime); } catch (_) { }
         }
 
         let _studentMapInitialized = false;
         let _studentBusMarkers = new Map();
         let _studentBusPollTimer = null;
         let _studentBusChannel = null;
-        
+
         function initStudentMap() {
             try {
                 const el = document.getElementById('college-map-student');
@@ -490,16 +522,16 @@
                 if (!el.style.height || el.clientHeight === 0) { el.style.height = '100%'; }
                 const LAT = 13.177470064893306;
                 const LNG = 80.09811982470028;
-                
+
                 // If map already exists, just recenter and update marker/handlers
                 if (window._studentLeafletMap) {
                     try {
                         window._studentLeafletMap.setView([LAT, LNG], 16);
                         if (window._studentMarker) { window._studentMarker.setLatLng([LAT, LNG]); }
                         window._studentLeafletMap.off('click');
-                        window._studentLeafletMap.on('click', () => { try { window.open(`https://www.google.com/maps?q=${LAT},${LNG}`, '_blank'); } catch(_) {} });
+                        window._studentLeafletMap.on('click', () => { try { window.open(`https://www.google.com/maps?q=${LAT},${LNG}`, '_blank'); } catch (_) { } });
                         setTimeout(() => { window._studentLeafletMap.invalidateSize(false); }, 0);
-                    } catch(_) {}
+                    } catch (_) { }
                     return;
                 }
                 const map = L.map('college-map-student', { zoomControl: true, attributionControl: false }).setView([LAT, LNG], 16);
@@ -512,14 +544,14 @@
                     iconAnchor: [18, 36]
                 });
                 window._studentMarker = L.marker([LAT, LNG], { icon: pin })
-                  .addTo(map)
-                  .bindPopup('<b>Vel Tech University</b><br>400 Feet Outer Ring Rd, Avadi, Tamil Nadu 600055');
-                map.on('click', () => { try { window.open(`https://www.google.com/maps?q=${LAT},${LNG}`, '_blank'); } catch(_) {} });
-                window._studentMarker.on('click', (e) => { try { e.originalEvent?.stopPropagation?.(); } catch(_) {} });
+                    .addTo(map)
+                    .bindPopup('<b>Vel Tech University</b><br>400 Feet Outer Ring Rd, Avadi, Tamil Nadu 600055');
+                map.on('click', () => { try { window.open(`https://www.google.com/maps?q=${LAT},${LNG}`, '_blank'); } catch (_) { } });
+                window._studentMarker.on('click', (e) => { try { e.originalEvent?.stopPropagation?.(); } catch (_) { } });
                 _studentMapInitialized = true;
                 setTimeout(() => { map.invalidateSize(false); }, 300);
-                try { if (window.supabaseClient) { initLiveBusesStudent(); } } catch(_) {}
-            } catch (e) {}
+                try { if (window.supabaseClient) { initLiveBusesStudent(); } } catch (_) { }
+            } catch (e) { }
         }
 
         /**
@@ -565,14 +597,14 @@
                 }
             }
         });
-         
-         /**
-          * Initializes the admin notes display by fetching the latest note.
-          */
-         const ADMIN_NOTES_LAST_VIEWED_KEY = 'vt_admin_notes_last_viewed_at';
+
+        /**
+         * Initializes the admin notes display by fetching the latest note.
+         */
+        const ADMIN_NOTES_LAST_VIEWED_KEY = 'vt_admin_notes_last_viewed_at';
 
         function markNotesViewed(timestamp) {
-            try { localStorage.setItem(ADMIN_NOTES_LAST_VIEWED_KEY, timestamp || ''); } catch (_) {}
+            try { localStorage.setItem(ADMIN_NOTES_LAST_VIEWED_KEY, timestamp || ''); } catch (_) { }
             if (adminNotesBadge) adminNotesBadge.classList.add('hidden');
             if (dashboardNotesDot) dashboardNotesDot.classList.add('hidden');
             if (adminNotesDisplay) adminNotesDisplay.classList.remove('notes-blink');
@@ -617,37 +649,37 @@
                         adminNotesDisplay.textContent = 'No special notes from Admin at this time.';
                         markNotesViewed(new Date().toISOString());
                     }
-                } catch (e) { 
-                    console.error('initializeAdminNotes error', e); 
+                } catch (e) {
+                    console.error('initializeAdminNotes error', e);
                     adminNotesDisplay.textContent = 'Failed to load notes.';
                 }
             }
-         }
+        }
 
-         // Realtime subscription for admin notes
+        // Realtime subscription for admin notes
         let _notesChannel = null;
         function subscribeAdminNotes() {
             try {
                 if (!window.supabaseClient || _notesChannel) return;
                 _notesChannel = window.supabaseClient
-                  .channel('admin_notes_live_student')
-                  .on('postgres_changes', { event: '*', schema: 'public', table: 'admin_notes' }, (payload) => {
-                      try {
-                          const row = payload.new || payload.old || null;
-                          if (payload.eventType === 'DELETE') {
-                              initializeAdminNotes();
-                              return;
-                          }
-                          if (row && row.content && adminNotesDisplay) {
-                              adminNotesDisplay.textContent = row.content;
-                              handleNotesUpdate(row.updated_at || new Date().toISOString());
-                          } else {
-                              initializeAdminNotes();
-                          }
-                      } catch(_) {}
-                  })
-                  .subscribe();
-            } catch(_) {}
+                    .channel('admin_notes_live_student')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'admin_notes' }, (payload) => {
+                        try {
+                            const row = payload.new || payload.old || null;
+                            if (payload.eventType === 'DELETE') {
+                                initializeAdminNotes();
+                                return;
+                            }
+                            if (row && row.content && adminNotesDisplay) {
+                                adminNotesDisplay.textContent = row.content;
+                                handleNotesUpdate(row.updated_at || new Date().toISOString());
+                            } else {
+                                initializeAdminNotes();
+                            }
+                        } catch (_) { }
+                    })
+                    .subscribe();
+            } catch (_) { }
         }
 
         /**
@@ -799,10 +831,10 @@
             // Note: Escape key handler is now consolidated in the main escape key handler above
         }
 
-         /**
-          * Loads routes from the database and structures them for local use.
-          */
-         async function loadAdminRoutes() {
+        /**
+         * Loads routes from the database and structures them for local use.
+         */
+        async function loadAdminRoutes() {
             adminAddedRoutes = [];
             if (!window.supabaseClient) return;
             try {
@@ -811,23 +843,23 @@
                     .select('route_number, route_name, route_stops(sequence_order, estimated_arrival_time, bus_stops(stop_name))');
                 if (!error && Array.isArray(data)) {
                     adminAddedRoutes = data.map(r => {
-                        const stopsArr = (r.route_stops || []).sort((a,b)=>a.sequence_order-b.sequence_order);
-                        
-                        const stops = stopsArr.map(s => ({ 
-                            name: (s.bus_stops && s.bus_stops.stop_name) || '', 
-                            time: (s.estimated_arrival_time || '').toString().slice(0,5) // 24h HH:MM
+                        const stopsArr = (r.route_stops || []).sort((a, b) => a.sequence_order - b.sequence_order);
+
+                        const stops = stopsArr.map(s => ({
+                            name: (s.bus_stops && s.bus_stops.stop_name) || '',
+                            time: (s.estimated_arrival_time || '').toString().slice(0, 5) // 24h HH:MM
                         }));
-                        
+
                         const dep = stopsArr.length ? stops[0].time : ''; // Departure is first stop time
-                        const arr = stopsArr.length ? stops[stopsArr.length-1].time : ''; // ETA is last stop time
-                        
+                        const arr = stopsArr.length ? stops[stopsArr.length - 1].time : ''; // ETA is last stop time
+
                         const sched = {};
                         // Schedule for all days is the same (based on the stops data)
-                        daysOfWeek.forEach(d=>{ 
-                            sched[d]={ 
-                                departureTime: dep, 
-                                eta: arr 
-                            }; 
+                        daysOfWeek.forEach(d => {
+                            sched[d] = {
+                                departureTime: dep,
+                                eta: arr
+                            };
                         });
                         return { busNo: r.route_number, route: r.route_name, schedule: sched, stops, isUserAdded: true };
                     });
@@ -835,12 +867,12 @@
                     console.error("Error loading admin routes:", error);
                 }
             } catch (e) { console.error('loadAdminRoutes DB error', e); }
-         }
+        }
 
-         /**
-          * Generates and displays the clickable weekly date buttons.
-          */
-         function generateWeeklyDates() {
+        /**
+         * Generates and displays the clickable weekly date buttons.
+         */
+        function generateWeeklyDates() {
             weeklyDatesContainer.innerHTML = '';
             const today = new Date();
             const dayOfWeek = today.getDay(); // 0 for Sunday, 1 for Monday...
@@ -853,7 +885,7 @@
             for (let i = 0; i < 6; i++) {
                 const date = new Date(startOfWeek);
                 date.setDate(startOfWeek.getDate() + i);
-                
+
                 const dayName = daysOfWeek[date.getDay()].substring(0, 3);
                 const dateNum = date.getDate();
                 const month = date.toLocaleString('default', { month: 'short' });
@@ -884,7 +916,7 @@
                     populateScheduleTable(selectedDate);
                 });
             });
-         }
+        }
 
 
         function setActiveTab(activeBtn) {
@@ -907,65 +939,99 @@
         scheduleTab.addEventListener('click', async () => {
             hideAllSections();
             scheduleSection.classList.remove('hidden');
-            
+
             // Reload routes and then display
             await loadAdminRoutes();
-            generateWeeklyDates(); 
-            populateScheduleTable(new Date()); 
-            
-            try { setActiveTab(scheduleTab); location.hash = '#schedule'; } catch(_) {}
+            generateWeeklyDates();
+            populateScheduleTable(new Date());
+
+            try { setActiveTab(scheduleTab); location.hash = '#schedule'; } catch (_) { }
         });
 
-        
+
 
         messageOkBtn.addEventListener('click', hideMessage);
-        
+
         // --- Optional Live Bus Markers (Student) ---
         function initLiveBusesStudent() {
             try {
                 if (!window.supabaseClient || !window._studentLeafletMap) return;
                 if (!_studentBusMarkers) _studentBusMarkers = new Map();
-                
+
                 // initial load
                 loadCurrentBusPositionsStudent();
-                
+
                 // polling every 10s (works without Realtime but Realtime is better)
                 if (!_studentBusPollTimer) {
                     _studentBusPollTimer = setInterval(loadCurrentBusPositionsStudent, 10000);
                 }
                 subscribeBusPositionsStudent();
-            } catch (e) {}
+            } catch (e) { }
         }
 
         async function loadCurrentBusPositionsStudent() {
             try {
                 if (!window.supabaseClient) return;
-                const { data, error } = await window.supabaseClient.from('bus_positions').select('bus_no, lat, lng');
-                if (!error && Array.isArray(data)) {
-                    const seen = new Set();
-                    data.forEach(r => {
-                        if (r && r.bus_no != null && r.lat != null && r.lng != null) {
-                            seen.add(r.bus_no);
-                            upsertBusMarkerStudent(r.bus_no, r.lat, r.lng);
+
+                // Get bus positions
+                const { data: positions, error: posError } = await window.supabaseClient
+                    .from('bus_positions')
+                    .select('bus_no, lat, lng');
+
+                if (posError || !Array.isArray(positions)) return;
+
+                // Get active route assignments
+                const { data: assignments, error: assignError } = await window.supabaseClient
+                    .from('active_route_assignments')
+                    .select('driver_id, route_number, route_name, status')
+                    .eq('status', 'active');
+
+                // Create a map of bus_no -> route info
+                const routeMap = new Map();
+                if (!assignError && Array.isArray(assignments)) {
+                    assignments.forEach(a => {
+                        if (a.driver_id && a.route_number) {
+                            routeMap.set(a.driver_id, {
+                                routeNumber: a.route_number,
+                                routeName: a.route_name || ''
+                            });
                         }
                     });
-                    if (_studentBusMarkers) {
-                        Array.from(_studentBusMarkers.keys()).forEach(key => {
-                            if (!seen.has(key)) {
-                                removeBusMarkerStudent(key);
-                            }
-                        });
-                    }
                 }
-            } catch (e) {}
+
+                const seen = new Set();
+                positions.forEach(r => {
+                    if (r && r.bus_no != null && r.lat != null && r.lng != null) {
+                        seen.add(r.bus_no);
+                        const routeInfo = routeMap.get(r.bus_no);
+                        upsertBusMarkerStudent(r.bus_no, r.lat, r.lng, routeInfo);
+                    }
+                });
+
+                if (_studentBusMarkers) {
+                    Array.from(_studentBusMarkers.keys()).forEach(key => {
+                        if (!seen.has(key)) {
+                            removeBusMarkerStudent(key);
+                        }
+                    });
+                }
+            } catch (e) { }
         }
 
-        function upsertBusMarkerStudent(busNo, lat, lng) {
+        function upsertBusMarkerStudent(busNo, lat, lng, routeInfo) {
             try {
                 if (!_studentBusMarkers) _studentBusMarkers = new Map();
                 const pos = [lat, lng];
+
+                // Determine display label: use route if available, otherwise bus number
+                const displayLabel = routeInfo
+                    ? `${routeInfo.routeNumber}${routeInfo.routeName ? ' - ' + routeInfo.routeName : ''}`
+                    : `Bus ${busNo}`;
+
                 if (_studentBusMarkers.has(busNo)) {
-                    _studentBusMarkers.get(busNo).setLatLng(pos);
+                    const marker = _studentBusMarkers.get(busNo);
+                    marker.setLatLng(pos);
+                    marker.setTooltipContent(displayLabel);
                 } else {
                     // Custom bus icon placeholder (simple blue marker)
                     const busIcon = L.divIcon({
@@ -974,46 +1040,38 @@
                         iconSize: [24, 24],
                         iconAnchor: [12, 24]
                     });
-                    
-                    const mk = L.marker(pos, { icon: busIcon, title: `Bus ${busNo}` }).addTo(window._studentLeafletMap).bindTooltip(`Bus ${busNo}`);
+
+                    const mk = L.marker(pos, { icon: busIcon, title: displayLabel })
+                        .addTo(window._studentLeafletMap)
+                        .bindTooltip(displayLabel);
                     _studentBusMarkers.set(busNo, mk);
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function removeBusMarkerStudent(busNo) {
             try {
                 if (_studentBusMarkers && _studentBusMarkers.has(busNo)) {
                     const mk = _studentBusMarkers.get(busNo);
-                    try { window._studentLeafletMap.removeLayer(mk); } catch(_) {}
+                    try { window._studentLeafletMap.removeLayer(mk); } catch (_) { }
                     _studentBusMarkers.delete(busNo);
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function subscribeBusPositionsStudent() {
             try {
-                if (!window.supabaseClient || _studentBusChannel) return;
-                _studentBusChannel = window.supabaseClient
-                  .channel('bus_positions_live_student')
-                  .on('postgres_changes', { event: '*', schema: 'public', table: 'bus_positions' }, (payload) => {
-                      try {
-                          const row = payload.new || payload.old || null;
-                          if (payload.eventType === 'DELETE') {
-                              if (row && row.bus_no != null) removeBusMarkerStudent(row.bus_no);
-                              return;
-                          }
-                          if (row && row.bus_no != null && row.lat != null && row.lng != null) {
-                              upsertBusMarkerStudent(row.bus_no, row.lat, row.lng);
-                          } else if (row && row.bus_no != null) {
-                              removeBusMarkerStudent(row.bus_no);
-                          } else {
-                              loadCurrentBusPositionsStudent();
-                          }
-                      } catch (_) {}
-                  })
-                  .subscribe();
-            } catch (_) {}
+                if (!window.supabaseClient || _studentBusPosChannel) return;
+                _studentBusPosChannel = window.supabaseClient
+                    .channel('bus_positions_live_student')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'bus_positions' }, (payload) => {
+                        try {
+                            // Reload all positions to get updated route assignments
+                            loadCurrentBusPositionsStudent();
+                        } catch (_) { }
+                    })
+                    .subscribe();
+            } catch (_) { }
         }
 
         // Refresh student KPIs on dashboard show and periodically (visibility-aware) + hash routing
@@ -1033,7 +1091,7 @@
                             refreshStudentDashboardStats();
                             if (!window._studentKpiTimer) { window._studentKpiTimer = setInterval(refreshStudentDashboardStats, 15000); }
                         }
-                    } catch(_) {}
+                    } catch (_) { }
                 });
 
                 // Hash routing: #dashboard, #schedule
@@ -1049,10 +1107,10 @@
                     // Default view
                     showDashboard();
                 }
-            } catch(_) {}
+            } catch (_) { }
         }
 
-        
+
         scheduleTableBody.addEventListener('click', (e) => {
             const row = e.target.closest('tr');
             if (row) {
@@ -1067,6 +1125,149 @@
         if (emergencyBtn) { emergencyBtn.addEventListener('click', showEmergencyModal); }
         if (closeEmergencyModal) { closeEmergencyModal.addEventListener('click', hideEmergencyModal); }
         if (panicButton) { panicButton.addEventListener('click', handlePanicButton); }
+
+        // --- Notification Logic ---
+        const notificationBtn = document.getElementById('notification-btn');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        const notificationBadge = document.getElementById('notification-badge');
+        const notificationList = document.getElementById('notification-list');
+        const markAllReadBtn = document.getElementById('mark-all-read');
+        let notifications = [];
+
+        function initNotifications() {
+            if (!notificationBtn || !notificationDropdown) return;
+
+            // Toggle dropdown
+            notificationBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notificationDropdown.classList.toggle('hidden');
+                if (!notificationDropdown.classList.contains('hidden')) {
+                    markNotificationsAsViewed();
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                    notificationDropdown.classList.add('hidden');
+                }
+            });
+
+            // Mark all as read
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', markAllNotificationsRead);
+            }
+
+            // Initial fetch and subscribe
+            fetchNotifications();
+            subscribeToNotifications();
+        }
+
+        async function fetchNotifications() {
+            if (!window.supabaseClient) return;
+
+            try {
+                // Fetch notifications for 'all' or 'students' within last 24 hours
+                const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+                const { data, error } = await window.supabaseClient
+                    .from('notifications')
+                    .select('*')
+                    .or('recipient_type.eq.all,recipient_type.eq.students')
+                    .gte('created_at', oneDayAgo)
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+
+                if (!error && data) {
+                    notifications = data;
+                    updateNotificationUI();
+                }
+            } catch (e) {
+                console.error('Error fetching notifications:', e);
+            }
+        }
+
+        function subscribeToNotifications() {
+            if (!window.supabaseClient) return;
+
+            window.supabaseClient
+                .channel('public:notifications')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, payload => {
+                    const newNotif = payload.new;
+                    if (newNotif && (newNotif.recipient_type === 'all' || newNotif.recipient_type === 'students')) {
+                        notifications.unshift(newNotif);
+                        updateNotificationUI();
+                        // Optional: Show a toast/alert for new high-priority notifications
+                        if (newNotif.notification_type === 'emergency' || newNotif.notification_type === 'warning') {
+                            showMessage(`🔔 New Alert: ${newNotif.title}`);
+                        }
+                    }
+                })
+                .subscribe();
+        }
+
+        function updateNotificationUI() {
+            if (!notificationList || !notificationBadge) return;
+
+            // Update Badge (count unread locally for simplicity, or implementation specifics)
+            // For this simple version, we'll check local storage to see which IDs are read
+            const readIds = JSON.parse(localStorage.getItem('vt_read_notifications') || '[]');
+            const unreadCount = notifications.filter(n => !readIds.includes(n.id)).length;
+
+            if (unreadCount > 0) {
+                notificationBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                notificationBadge.classList.remove('hidden');
+            } else {
+                notificationBadge.classList.add('hidden');
+            }
+
+            // Render List
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">No new notifications</div>';
+            } else {
+                notificationList.innerHTML = notifications.map(n => {
+                    const isRead = readIds.includes(n.id);
+                    const bgClass = isRead ? 'bg-white' : 'bg-blue-50';
+                    const icon = getNotificationIcon(n.notification_type);
+                    return `
+                        <div class="px-4 py-3 border-b border-gray-100 ${bgClass} hover:bg-gray-50 transition-colors duration-150">
+                            <div class="flex items-start">
+                                <span class="flex-shrink-0 pt-0.5">${icon}</span>
+                                <div class="ml-3 w-full">
+                                    <p class="text-sm font-medium text-gray-900">${n.title}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">${n.message}</p>
+                                    <p class="text-xs text-gray-400 mt-1">
+                                        ${new Date(n.created_at).toLocaleString()}
+                                        ${n.specific_bus ? `<br><span class="text-blue-500">Bus: ${n.specific_bus}</span>` : ''}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function getNotificationIcon(type) {
+            switch (type) {
+                case 'emergency': return '🚨';
+                case 'warning': return '⚠️';
+                case 'success': return '✅';
+                case 'info': default: return 'ℹ️';
+            }
+        }
+
+        function markNotificationsAsViewed() {
+            // When dropdown opens, we could mark them as "viewed" but maybe not "read" yet
+            // For now, let's keep "read" as explicit or when clicking "mark all read"
+            // Or we can auto-mark all displayed as read?
+            // User requirement was just "recieve msg", so let's keep it simple.
+        }
+
+        function markAllNotificationsRead() {
+            const allIds = notifications.map(n => n.id);
+            localStorage.setItem('vt_read_notifications', JSON.stringify(allIds));
+            updateNotificationUI();
+        }
 
         function logoutStudent() {
             try {
@@ -1095,7 +1296,7 @@
                         window.supabaseClient.removeChannel(_notesChannel);
                         _notesChannel = null;
                     }
-                } catch (e) {}
+                } catch (e) { }
 
                 // Clear map and markers if they exist
                 try {
@@ -1108,7 +1309,7 @@
                         _studentBusMarkers.clear();
                         _studentBusMarkers = null;
                     }
-                } catch (e) {}
+                } catch (e) { }
 
                 // Clear local storage
                 localStorage.removeItem('vt_student_authed');
@@ -1151,6 +1352,9 @@
                 // Initialize student interface features
                 await initializeStudentInterface();
 
+                // Initialize notifications
+                initNotifications();
+
                 // Log student login (once per load)
                 logStudentLogin();
 
@@ -1162,4 +1366,5 @@
         studentLogoutBtn.addEventListener('click', logoutStudent);
     </script>
 </body>
+
 </html>

@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.production
+.env.staging
+
+# Logs
+logs/
+*.log
+
+# Runtime
+.cache/
+dist/
+build/
+
+# Backup
+*.backup
+*.zip
+*.rar
+
+# Temporary
+tmp/
+temp/
+
+# Database
+*.db
+*.sqlite
+
+# Supabase
+# Keep config but ignore keys
+supabase-config.js.bak

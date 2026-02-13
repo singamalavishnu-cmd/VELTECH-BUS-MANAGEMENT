@@ -3,6 +3,16 @@
   command = "echo 'Static site - no build required'"
 
 [[redirects]]
+  from = "/driver"
+  to = "/driver.html"
+  status = 301
+
+[[redirects]]
+  from = "/driver-auth"
+  to = "/driver-auth.html"
+  status = 301
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

@@ -3435,8 +3435,8 @@
 
             // Combine routes and assignments data
             const combinedData = routes.map(route => {
-                const assignment = assignments.find(a => a.route_number === route.route_number);
-                const position = positions.find(p => p.bus_no === route.route_number);
+                const assignment = assignments.find(a => String(a.route_number) === String(route.route_number));
+                const position = positions.find(p => String(p.bus_no) === String(route.route_number));
 
                 // Calculate scheduled trips for today based on bus schedule
                 const today = new Date().getDay();

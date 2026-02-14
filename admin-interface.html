@@ -2226,6 +2226,12 @@
                         }
                     });
                 }
+
+                // Update unified routes table if visible (real-time status)
+                const manageSection = document.getElementById('manage-section');
+                if (manageSection && !manageSection.classList.contains('hidden')) {
+                    loadUnifiedRoutes();
+                }
             } catch (_) { }
         }
 

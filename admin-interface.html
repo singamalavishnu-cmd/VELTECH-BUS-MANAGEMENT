@@ -3469,6 +3469,7 @@
 
             if (combinedData.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="py-3 px-6 text-center text-gray-400">No routes found</td></tr>';
+                updateDashboardStats([], [], []);
                 return;
             }
 
@@ -3508,6 +3509,42 @@
                 `;
                 tbody.appendChild(row);
             });
+
+            // Update Dashboard Stats matches with table data
+            updateDashboardStats(routes, assignments, positions);
+        }
+
+        function updateDashboardStats(routes, assignments, positions) {
+            try {
+                // Active Buses: Count positions with status 'Going' or 'Riding'
+                // We need to use calculateDriverStatus logic again or reuse the result if passed
+                let activeCount = 0;
+                if (positions && positions.length > 0) {
+                    activeCount = positions.filter(p => {
+                        const status = calculateDriverStatus(p);
+                        return status === 'Going' || status === 'Riding';
+                    }).length;
+                }
+
+                // Scheduled Trips Today (Total assignments)
+                const scheduledTrips = assignments ? assignments.length : 0;
+
+                // On-Time Departures (Mock logic or based on actual data if available)
+                // For now, let's count active assignments as potential on-time
+                const onTimeCount = assignments ? assignments.filter(a => a.status === 'active').length : 0;
+
+                // Update DOM
+                const activeBusesEl = document.getElementById('active-buses-count');
+                const onTimeEl = document.getElementById('on-time-count');
+                const tripsTodayEl = document.getElementById('trips-today-count');
+
+                if (activeBusesEl) activeBusesEl.textContent = activeCount;
+                if (onTimeEl) onTimeEl.textContent = onTimeCount; // Using active assignments as proxy for now
+                if (tripsTodayEl) tripsTodayEl.textContent = scheduledTrips;
+
+            } catch (e) {
+                console.error('Error updating dashboard stats:', e);
+            }
         }
 
         // Edit route function

@@ -3808,6 +3808,7 @@
                 showLoading();
 
                 try {
+                    const formData = new FormData(assignDriverForm);
                     const selectedOption = driverBusNumberSelect.options[driverBusNumberSelect.selectedIndex];
                     const routeName = selectedOption ? (selectedOption.getAttribute('data-route-name') || '') : '';
 
